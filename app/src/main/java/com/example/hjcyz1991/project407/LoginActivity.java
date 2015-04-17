@@ -6,15 +6,18 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
@@ -28,12 +31,14 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.hjcyz1991.project407.Model.Backend;
+//import com.example.hjcyz1991.project407.Model.Backend;
+import com.example.hjcyz1991.project407.Model.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Date;
 
 /**
  * A login screen that offers login via email/password.
@@ -93,7 +98,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         register.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent
+
             }
         });
 
@@ -274,22 +279,58 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
+            final String TAG = "LOGIN_ACTIVITY";
+            final Context currContext = LoginActivity.this;
             Backend.logIn(mEmail, mPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
-//                    User user = (User) result;
-                    Log.d(null, "Login success. User: ");
+                    //User a = new User();
+                    //Log.d(TAG, "Login success. A: " + a.toString());
+                    final User user = (User) result;
+                    //if(result == null) Log.d(null, "empty");
+                    Log.d(TAG, "Login success. User: " + user.toString());
 
-                    //TESTING
-//                    loadPoses(user);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //check db for user with existing backendId. If doesn't exit, then save
+                            List<User> users = User.find(User.class, "backend_id = ?", new Integer(
+                                    user.backendId).toString());
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            //Log.d(null, "backendId check");
+                            if(users.size() == 0){
+                                Log.d(null, "ok: " + user.created_at.getTime());
+                                user.save();
+                                editor.putString("loggedInId", Long.toString(user.getId()));
+                                editor.commit();
+                            }else{
+                                User currUser = users.get(0);
+                                currUser.authToken = user.authToken;
+                                currUser.authTokenConfirm = user.authTokenConfirm;
+                                currUser.tokenExpiration = user.tokenExpiration;
+                                currUser.save();
+                                editor.putString("loggedInId", Long.toString(user.getId()));
+                                editor.commit();
+                            }
+                            Intent intent = new Intent(currContext, MainActivity.class);
+                            startActivity(intent);
+                        }
+                    });
                 }
 
                 @Override
-                public void onRequestFailed(String message) {
+                public void onRequestFailed(final String message) {
 
                     //NOTE: parameter validation and filtering is handled by the backend, just show the
                     //returned error message to the user
-                    Log.d(null, "Received error from Backend: " + message);
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             });
 

@@ -49,31 +49,22 @@ public class Backend {
         List<Header> headers = new ArrayList<Header>();
         headers.add(new BasicHeader("Accept", "application/json"));
         headers.add(new BasicHeader("Content-Type", "application/json"));
-//        client.get("users/", new JsonResponseHandler() {
-//            @Override public void onSuccess() {
-//                Log.d(null, "succ");
-//            }
-//
-//        });
+
         client.post("users/authenticate", jsonParams, headers, new JsonResponseHandler() {
             @Override public void onSuccess() {
                 JsonObject result = getContent().getAsJsonObject();
                 //////testing//////////
                 Log.d(null, "successful");
 
-                /*Remember, we defined our User class to have a field backendId.  Therefore, we must move the “id”
-property in the object returned to a new property “backendId”.  Some of you might be thinking, “Why not just
-change the field of user to “id” rather than backendId”?  The short answer is that this will create some
-conflicts in what we will be doing later on, and become more clear in the next lab.*/
 
                 result.addProperty("backendId", result.get("id").toString());
                 result.remove("id");
 
                 Log.d(TAG, "Login returned: " + result);
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
-//                User user = gson.fromJson(result, User.class);
-//
-//                callback.onRequestCompleted(user);
+                User user = gson.fromJson(result, User.class);
+
+                callback.onRequestCompleted(user);
             }
 
             @Override

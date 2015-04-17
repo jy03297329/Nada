@@ -1,13 +1,15 @@
 package com.example.hjcyz1991.project407.Model;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Date;
+import com.orm.SugarRecord;
 
 /**
  * Created by Winston on 4/12/15.
  */
-public class User {
+public class User extends SugarRecord<User>{
     public int backendId;
 
     public Date created_at;
@@ -16,6 +18,7 @@ public class User {
     public String email;
 
     public String authToken;
+    public String authTokenConfirm;
     public Date tokenExpiration;
 
     public HashSet<User> friends;
@@ -27,8 +30,8 @@ public class User {
     public HashSet<BillEvent> eventPay;
     public HashSet<BillEvent> eventRec;
 
-    double moneyPay;
-    double moneyRec;
+    public double moneyPay;
+    public double moneyRec;
 
     File avatar;
 
@@ -36,6 +39,7 @@ public class User {
         name = "";
         email = "";
         created_at = new Date();
+        tokenExpiration = new Date();
 
         friends = new HashSet<User>();
         billPay = new HashSet<Bill>();
@@ -51,11 +55,12 @@ public class User {
 
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("\n\t id: " + backendId);
         sb.append("\n\t name: " + name);
         sb.append("\n\t email: "+ email);
-        sb.append("\n\t authToken: " + authToken);
-        sb.append("\n\t tokenExpiration: " + tokenExpiration.toString());
+        sb.append("\n\t id: " + backendId);
+        sb.append("\n\t created at: " + created_at);
+        //sb.append("\n\t authToken: " + authToken);
+        //sb.append("\n\t tokenExpiration: " + tokenExpiration.toString());
 
         return sb.toString();
     }
