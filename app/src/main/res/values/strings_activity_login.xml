@@ -2,7 +2,7 @@
 
     <!-- Strings related to login -->
     <string name="prompt_email_login">Email</string>
-    <string name="prompt_password_login">Password</string>
+    <string name="prompt_password_login">Password (Minimum length 6)</string>
 
     <string name="error_invalid_email">This email address is invalid</string>
     <string name="error_invalid_password">This password is too short</string>

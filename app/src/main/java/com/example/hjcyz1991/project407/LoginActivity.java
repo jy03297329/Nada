@@ -38,7 +38,6 @@ import com.example.hjcyz1991.project407.Model.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Date;
 
 /**
  * A login screen that offers login via email/password.
@@ -78,7 +77,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if ( id == EditorInfo.IME_NULL) {
+                if ( id == R.id.login || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
@@ -86,19 +85,24 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.button_login);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        login = (Button) findViewById(R.id.button_login);
+        login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
 
-        Button register = (Button) findViewById(R.id.button_Register);
+        register = (Button) findViewById(R.id.button_Register);
         register.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(LoginActivity.this, Registration.class);
+                Bundle bundle = new Bundle();
+                bundle.putString("email", mEmailView.getText().toString());
+                bundle.putString("password", mPasswordView.getText().toString());
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
 

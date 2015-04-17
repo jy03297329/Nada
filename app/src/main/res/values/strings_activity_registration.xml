@@ -3,7 +3,7 @@
 
     <!-- Strings related to login -->
     <string name="prompt_email_register">Email</string>
-    <string name="prompt_password_register">Password</string>
+    <string name="prompt_password_register">Password (Minimum length 6)</string>
     <string name="prompt_password_register_confirmation">Confirm Password</string>
     <string name="action_register">Sign Up</string>
     <string name="action_register_short">Register</string>
@@ -12,6 +12,7 @@
     <string name="error_invalid_password_register">This password is too short</string>
     <string name="error_incorrect_password_register">This password is incorrect</string>
     <string name="error_field_required_register">This field is required</string>
+    <string name="error_password_not_match">Passwords do not match</string>
 
     <string name="register_title">Sign Up to Nada</string>
     <string name="first_name">First Name</string>
