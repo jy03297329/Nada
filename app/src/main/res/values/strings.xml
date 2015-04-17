@@ -3,15 +3,7 @@
 
     <string name="app_name">Project407</string>
 
-<<<<<<< HEAD
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-
-=======
 <!-- TODO: Remove or change this placeholder text -->
 <string name="title">Nada</string>
->>>>>>> 814f42e9b7ee523f4907ad4aac34d62aaff1fd47
+
 </resources>
