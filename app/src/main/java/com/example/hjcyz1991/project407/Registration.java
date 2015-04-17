@@ -20,6 +20,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -50,40 +51,59 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mPasswordViewConfirm;
+    private EditText lastName;
+    private EditText firstName;
     private View mProgressView;
     private View mLoginFormView;
+    private Button register;
+    private static final int PASSWORD_NOT_MATCH = 0;
+    private static final int PASSWORD_NOT_VALID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_registration);
 
         // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView = (AutoCompleteTextView) findViewById(R.id.email_register);
+        Bundle bundle = getIntent().getExtras();
+        String email = bundle.getString("email");
+        mEmailView.setText(email);
+
+        mPasswordView = (EditText) findViewById(R.id.password_register);
+        String password = bundle.getString("password");
+        mPasswordView.setText(password);
+
+        mPasswordViewConfirm = (EditText) findViewById(R.id.password_confirmation_register);
+        if(mEmailView.getText().length() > 0 && mPasswordView.getText().length() > 0)
+            mPasswordViewConfirm.requestFocus();
+
+        lastName = (AutoCompleteTextView) findViewById(R.id.last_name_register);
+        firstName = (AutoCompleteTextView) findViewById(R.id.first_name_register);
         populateAutoComplete();
 
-        mPasswordView = (EditText) findViewById(R.id.password);
-        mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        lastName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
+                if (id == R.id.last_name_ime || id == EditorInfo.IME_NULL) {
+                    attemptRegister();
                     return true;
                 }
                 return false;
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-        mEmailSignInButton.setOnClickListener(new OnClickListener() {
+        register = (Button) findViewById(R.id.email_sign_in_button);
+        register.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                attemptLogin();
+                attemptRegister();
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        mLoginFormView = findViewById(R.id.login_form_register);
+        mProgressView = findViewById(R.id.login_progress_register);
     }
 
     private void populateAutoComplete() {
@@ -96,7 +116,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    public void attemptLogin() {
+    public void attemptRegister() {
         if (mAuthTask != null) {
             return;
         }
@@ -108,15 +128,21 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String passwordConfirm = mPasswordViewConfirm.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password) && isPasswordValid(password, passwordConfirm) == PASSWORD_NOT_VALID) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
+            cancel = true;
+        }
+        if(isPasswordValid(password, passwordConfirm) == PASSWORD_NOT_VALID){
+            mPasswordViewConfirm.setError(getString(R.string.error_password_not_match));
+            focusView = mPasswordViewConfirm;
             cancel = true;
         }
 
@@ -145,13 +171,16 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
+        return email.contains("@") && email.contains(".");
     }
 
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
+    private int isPasswordValid(String password, String passwordConfirm) {
+
+        if(password.length() < 6)
+            return PASSWORD_NOT_VALID;
+        if(!password.equals(passwordConfirm))
+            return PASSWORD_NOT_MATCH;
+        return 2;
     }
 
     /**
@@ -216,7 +245,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
             cursor.moveToNext();
         }
 
-        addEmailsToAutoComplete(emails);
+//        addEmailsToAutoComplete(emails);
     }
 
     @Override
@@ -235,14 +264,14 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
     }
 
 
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(Registration.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
+//    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
+//        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
+//        ArrayAdapter<String> adapter =
+//                new ArrayAdapter<String>(Registration.this,
+//                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
+//
+//        mEmailView.setAdapter(adapter);
+//    }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate

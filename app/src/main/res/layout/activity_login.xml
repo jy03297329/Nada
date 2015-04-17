@@ -72,6 +72,8 @@
         android:maxLines="1"
         android:singleLine="true"
         android:ems="10"
+        android:imeActionId="@+id/login"
+        android:imeOptions="actionGo"
         android:inputType="textPassword"
         android:layout_marginBottom="10dp"/>
 
