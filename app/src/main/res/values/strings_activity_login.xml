@@ -11,5 +11,5 @@
 
     <string name="welcome_login">Welcome to Nada</string>
     <string name="button_login">Log In</string>
-    <string name="button_register">Register</string>
+    <string name="button_register">Sign Up</string>
 </resources>
