@@ -5,10 +5,13 @@
     android:layout_height="wrap_content">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/main_actionbar_title"
         android:gravity="center"
-        android:text="@string/title"/>
+        android:text="@string/title"
+        android:textColor="#ffffff"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
 
 </LinearLayout>

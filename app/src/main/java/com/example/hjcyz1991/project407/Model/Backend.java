@@ -39,8 +39,6 @@ public class Backend {
             JSONObject json = new JSONObject();
             json.put("email", email);
             json.put("password", password);
-            ////////////////////////
-            System.out.println(json.toString());
             jsonParams = new StringEntity(json.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -49,17 +47,10 @@ public class Backend {
         List<Header> headers = new ArrayList<Header>();
         headers.add(new BasicHeader("Accept", "application/json"));
         headers.add(new BasicHeader("Content-Type", "application/json"));
-//        client.get("users/", new JsonResponseHandler() {
-//            @Override public void onSuccess() {
-//                Log.d(null, "succ");
-//            }
-//
-//        });
+
         client.post("users/authenticate", jsonParams, headers, new JsonResponseHandler() {
             @Override public void onSuccess() {
                 JsonObject result = getContent().getAsJsonObject();
-                //////testing//////////
-                Log.d(null, "successful");
 
                 /*Remember, we defined our User class to have a field backendId.  Therefore, we must move the “id”
 property in the object returned to a new property “backendId”.  Some of you might be thinking, “Why not just
@@ -73,12 +64,11 @@ conflicts in what we will be doing later on, and become more clear in the next l
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
 //                User user = gson.fromJson(result, User.class);
 //
-//                callback.onRequestCompleted(user);
+                callback.onRequestCompleted(null);
             }
 
             @Override
             public void onFailure() {
-                //////testing//////////
                 Log.d(null, "failed");
                 callback.onRequestFailed(handleFailure(getContent()));
             }
