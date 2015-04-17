@@ -18,4 +18,14 @@ public class Bill extends SugarRecord<Bill> {
     public BillEvent event;
 
     public double moneyAmt;
+
+    public Bill(){
+        created_at = new Date();
+        debtor = new User();
+        creditor = new User();
+        event = new BillEvent();
+        moneyAmt = 0.0;
+    }
 }
+
+

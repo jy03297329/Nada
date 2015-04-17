@@ -59,8 +59,6 @@ public class User extends SugarRecord<User>{
         sb.append("\n\t email: "+ email);
         sb.append("\n\t id: " + backendId);
         sb.append("\n\t created at: " + created_at);
-        //sb.append("\n\t authToken: " + authToken);
-        //sb.append("\n\t tokenExpiration: " + tokenExpiration.toString());
 
         return sb.toString();
     }

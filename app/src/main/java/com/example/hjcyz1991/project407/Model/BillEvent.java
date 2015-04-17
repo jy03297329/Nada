@@ -12,4 +12,8 @@ public class BillEvent extends SugarRecord<BillEvent> {
     public int backendId;
 
     public Date created_at;
+
+    public BillEvent(){
+        created_at = new Date();
+    }
 }
