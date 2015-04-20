@@ -288,8 +288,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             Backend.logIn(mEmail, mPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
-                    //User a = new User();
-                    //Log.d(TAG, "Login success. A: " + a.toString());
+
                     final User user = (User) result;
                     //if(result == null) Log.d(null, "empty");
                     Log.d(TAG, "Login success. User: " + user.toString());
@@ -304,18 +303,21 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             SharedPreferences.Editor editor = prefs.edit();
                             //Log.d(null, "backendId check");
                             if(users.size() == 0){
-                                Log.d(null, "ok: " + user.created_at.getTime());
+                                Log.d(null, "new user: " + user.toString());
                                 user.save();
+                                Log.d(null, "no problem");
                                 editor.putString("loggedInId", Long.toString(user.getId()));
                                 editor.commit();
                             }else{
                                 User currUser = users.get(0);
+                                Log.d(null, "curr user: " + currUser.toString());
                                 currUser.authToken = user.authToken;
                                 currUser.authTokenConfirm = user.authTokenConfirm;
-                                currUser.tokenExpiration = user.tokenExpiration;
+                                //currUser.tokenExpiration = user.tokenExpiration;
                                 currUser.save();
-                                editor.putString("loggedInId", Long.toString(user.getId()));
+                                editor.putString("loggedInId", Long.toString(currUser.getId()));
                                 editor.commit();
+
                             }
                             Intent intent = new Intent(currContext, MainActivity.class);
                             startActivity(intent);
@@ -337,7 +339,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     });
                 }
             });
-
+/*
                 try
 
                 {
@@ -363,7 +365,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         // Account exists, return true if the password matches.
                         return pieces[1].equals(mPassword);
                     }
-                }
+                }*/
 
                 // TODO: register the new account here.
                 return true;

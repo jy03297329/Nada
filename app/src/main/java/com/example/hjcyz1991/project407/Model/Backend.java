@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 
 /**
@@ -60,8 +61,21 @@ public class Backend {
                 result.addProperty("backendId", result.get("id").toString());
                 result.remove("id");
 
+                //String temp = result.get("created_at").toString();
+                //String temp2 = "\""
+                //Log.d(null, result.get("created_at").toString());
+                //String temp = "\"2013-02-10T13:45:30+0100\"";
+                //result.remove("created_at");
+                //result.addProperty("created_at", temp);
+
                 Log.d(TAG, "Login returned: " + result);
-                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
+                //Gson gson = new Gson();
+                //Date test = gson.fromJson(temp, Date.class);
+                //Log.d(null, "date:" + test);
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+                //Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
+                //Gson gson = new Gson();
+
                 User user = gson.fromJson(result, User.class);
 
                 callback.onRequestCompleted(user);

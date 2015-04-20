@@ -12,8 +12,9 @@ import com.orm.SugarRecord;
 public class User extends SugarRecord<User>{
     public int backendId;
 
-    public Date created_at;
+    //public Date created_at;
 
+    public String created_at;
     public String name;
     public String email;
 
@@ -38,7 +39,8 @@ public class User extends SugarRecord<User>{
     public User(){
         name = "";
         email = "";
-        created_at = new Date();
+        //created_at = new Date();
+        created_at = "";
         tokenExpiration = new Date();
 
         friends = new HashSet<User>();
@@ -62,5 +64,7 @@ public class User extends SugarRecord<User>{
 
         return sb.toString();
     }
+
+
 
 }
