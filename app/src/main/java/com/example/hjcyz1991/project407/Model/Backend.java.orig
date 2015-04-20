@@ -65,6 +65,7 @@ public class Backend {
                 //result.addProperty("created_at", temp);
 
                 Log.d(TAG, "Login returned: " + result);
+<<<<<<< HEAD
                 //Gson gson = new Gson();
                 //Date test = gson.fromJson(temp, Date.class);
                 //Log.d(null, "date:" + test);
@@ -72,9 +73,18 @@ public class Backend {
                 //Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
                 //Gson gson = new Gson();
 
+=======
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
+<<<<<<< HEAD
+//                User user = gson.fromJson(result, User.class);
+//
+                callback.onRequestCompleted(null);
+=======
+>>>>>>> 6af1fb3f5fc49fb2aedc3f312598781734a1e5c0
                 User user = gson.fromJson(result, User.class);
 
                 callback.onRequestCompleted(user);
+>>>>>>> 5ea17b76d0c211f38e2e8a4344bc7b7c7fcd3176
             }
 
             @Override
