@@ -288,18 +288,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             Backend.logIn(mEmail, mPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
-<<<<<<< HEAD
-//                    User user = (User) result;
-                    System.out.println("onRequestCompleted");
-                    Log.d(null, "Login success. User: ");
 
-                    //TESTING
-//                    loadPoses(user);
-
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-
-=======
                     //User a = new User();
                     //Log.d(TAG, "Login success. A: " + a.toString());
                     final User user = (User) result;
@@ -315,12 +304,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
                             SharedPreferences.Editor editor = prefs.edit();
                             //Log.d(null, "backendId check");
-                            if(users.size() == 0){
+                            if (users.size() == 0) {
                                 Log.d(null, "ok: " + user.created_at.getTime());
                                 user.save();
                                 editor.putString("loggedInId", Long.toString(user.getId()));
                                 editor.commit();
-                            }else{
+                            } else {
                                 User currUser = users.get(0);
                                 currUser.authToken = user.authToken;
                                 currUser.authTokenConfirm = user.authTokenConfirm;
@@ -333,7 +322,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             startActivity(intent);
                         }
                     });
->>>>>>> 5ea17b76d0c211f38e2e8a4344bc7b7c7fcd3176
                 }
 
                 @Override
@@ -350,35 +338,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     });
                 }
             });
-
-//                try
-//
-//                {
-//                    // Simulate network access.
-//                    Thread.sleep(2000);
-//                }
-//
-//                catch(
-//                InterruptedException e
-//                )
-//
-//                {
-//                    return false;
-//                }
-//
-//                for(
-//                String credential
-//                :DUMMY_CREDENTIALS)
-//
-//                {
-//                    String[] pieces = credential.split(":");
-//                    if (pieces[0].equals(mEmail)) {
-//                        // Account exists, return true if the password matches.
-//                        return pieces[1].equals(mPassword);
-//                    }
-//                }
-//
-//                // TODO: register the new account here.
                 return true;
             }
 

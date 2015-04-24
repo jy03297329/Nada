@@ -58,15 +58,11 @@ public class Backend {
 
                 Log.d(TAG, "Login returned: " + result);
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
-<<<<<<< HEAD
-//                User user = gson.fromJson(result, User.class);
-//
-                callback.onRequestCompleted(null);
-=======
+
                 User user = gson.fromJson(result, User.class);
 
                 callback.onRequestCompleted(user);
->>>>>>> 5ea17b76d0c211f38e2e8a4344bc7b7c7fcd3176
+
             }
 
             @Override

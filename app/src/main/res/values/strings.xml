@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<string name="app_name">Nada</string>
 
-    <string name="app_name">Project407</string>
-
-<!-- TODO: Remove or change this placeholder text -->
 <string name="title">Nada</string>
+<string name="add_new_bill_button">Add New Bill</string>
+<string name="pay_back_button">Pay Back</string>
+<string name="send_reminder_button">Send Reminder</string>
+<string name="view_bills_button">View Bills</string>
+<string name="profile_button">Profile</string>
+<string name="setting_button">Settings</string>
+<string name="action_add_friends">Add Friends</string>
+<string name="action_add_groups">Add Groups</string>
+<string name="action_scan_ur_code">Scan UR Code</string>
+<string name="title_activity_add_friends">AddFriends</string>
 
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_add_groups">AddGroups</string>
+    <string name="title_activity_scan_urcode">ScanURCode</string>
+    <string name="title_activity_add_new_bill">AddNewBill</string>
+    <string name="title_activity_pay_back">PayBack</string>
+    <string name="title_activity_send_reminder">SendReminder</string>
+    <string name="title_activity_view_bills">ViewBills</string>
+    <string name="title_activity_profile">Profile</string>
+    <string name="title_activity_settings">Settings</string>
 </resources>
