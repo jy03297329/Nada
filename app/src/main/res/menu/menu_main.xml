@@ -3,7 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.hjcyz1991.project407.MainActivity">
     <item
-        android:id="@+id/action_settings"
-        android:title="string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+        android:id="@+id/action_add_friends"
+        android:title="@string/action_add_friends"
+        android:orderInCategory="1"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_add_groups"
+        android:title="@string/action_add_groups"
+        android:orderInCategory="2"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_scan_ur_code"
+        android:title="@string/action_scan_ur_code"
+        android:orderInCategory="3"
+        app:showAsAction="never" />
 </menu>
