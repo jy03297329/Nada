@@ -65,24 +65,18 @@ public class Backend {
                 //result.addProperty("created_at", temp);
 
                 Log.d(TAG, "Login returned: " + result);
-<<<<<<< HEAD
-                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
-=======
+
                 //Gson gson = new Gson();
                 //Date test = gson.fromJson(temp, Date.class);
                 //Log.d(null, "date:" + test);
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
                 //Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").create();
                 //Gson gson = new Gson();
->>>>>>> 6e9aa1dcdc579ea9a0d121a3684312e7b3feac97
 
                 User user = gson.fromJson(result, User.class);
 
                 callback.onRequestCompleted(user);
-<<<<<<< HEAD
 
-=======
->>>>>>> 6e9aa1dcdc579ea9a0d121a3684312e7b3feac97
             }
 
             @Override
@@ -91,6 +85,51 @@ public class Backend {
                 callback.onRequestFailed(handleFailure(getContent()));
             }
         });
+    }
+
+    public static void register(String email, String password, String conPassword, final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+
+        try {
+            JSONObject json = new JSONObject();
+            json.put("email", email);
+            json.put("password", password);
+            json.put("password confirmation", conPassword);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+
+        client.post("users/authenticate", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                JsonObject result = getContent().getAsJsonObject();
+
+                result.addProperty("backendId", result.get("id").toString());
+                result.remove("id");
+
+                Log.d(TAG, "Register returned: " + result);
+
+                Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+
+                User user = gson.fromJson(result, User.class);
+
+                callback.onRequestCompleted(user);
+
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+
     }
 
     /* Convenience methods */

@@ -289,11 +289,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 @Override
                 public void onRequestCompleted(Object result) {
 
-<<<<<<< HEAD
-                    //User a = new User();
-                    //Log.d(TAG, "Login success. A: " + a.toString());
-=======
->>>>>>> 6e9aa1dcdc579ea9a0d121a3684312e7b3feac97
+
                     final User user = (User) result;
                     //if(result == null) Log.d(null, "empty");
                     Log.d(TAG, "Login success. User: " + user.toString());
@@ -307,13 +303,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
                             SharedPreferences.Editor editor = prefs.edit();
                             //Log.d(null, "backendId check");
-<<<<<<< HEAD
-                            if (users.size() == 0) {
-                                Log.d(null, "ok: " + user.created_at.getTime());
-=======
+
                             if(users.size() == 0){
                                 Log.d(null, "new user: " + user.toString());
->>>>>>> 6e9aa1dcdc579ea9a0d121a3684312e7b3feac97
                                 user.save();
                                 Log.d(null, "no problem");
                                 editor.putString("loggedInId", Long.toString(user.getId()));
@@ -349,38 +341,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     });
                 }
             });
-<<<<<<< HEAD
-=======
-/*
-                try
-
-                {
-                    // Simulate network access.
-                    Thread.sleep(2000);
-                }
-
-                catch(
-                InterruptedException e
-                )
-
-                {
-                    return false;
-                }
-
-                for(
-                String credential
-                :DUMMY_CREDENTIALS)
-
-                {
-                    String[] pieces = credential.split(":");
-                    if (pieces[0].equals(mEmail)) {
-                        // Account exists, return true if the password matches.
-                        return pieces[1].equals(mPassword);
-                    }
-                }*/
 
                 // TODO: register the new account here.
->>>>>>> 6e9aa1dcdc579ea9a0d121a3684312e7b3feac97
                 return true;
             }
 
