@@ -8,6 +8,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -30,8 +31,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hjcyz1991.project407.Model.*;
+
+import org.apache.http.entity.StringEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -132,6 +136,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
+        String name = firstName.getText().toString() + " " + lastName.getText().toString();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
         String passwordConfirm = mPasswordViewConfirm.getText().toString();
@@ -171,7 +176,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserRegistrationTask(email, password, passwordConfirm);
+            mAuthTask = new UserRegistrationTask(name, email, password, passwordConfirm);
             mAuthTask.execute((Void) null);
         }
     }
@@ -285,11 +290,13 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
      */
     public class UserRegistrationTask extends AsyncTask<Void, Void, Boolean> {
 
+        private final String mName;
         private final String mEmail;
         private final String mPassword;
         private final String mConPassword;
 
-        UserRegistrationTask(String email, String password, String conPassword) {
+        UserRegistrationTask(String name, String email, String password, String conPassword) {
+            mName = name;
             mEmail = email;
             mPassword = password;
             mConPassword = conPassword;
@@ -301,8 +308,8 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
             // TODO: attempt authentication against a network service.
             final String TAG = "REGISTRATION";
             final Context currContext = Registration.this;
-
-            Backend.register(mEmail, mPassword, mConPassword, new Backend.BackendCallback() {
+            Log.d(null, "name: " + mName + "email: " + mEmail);
+            Backend.register(mName, mEmail, mPassword, mConPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
                     final User user = (User) result;
@@ -315,12 +322,29 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
                                     user.backendId).toString());
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
                             SharedPreferences.Editor editor = prefs.edit();
+                            if(users.size() != 0){
+                                Log.d(null, "------local db error: already having" +
+                                        " new item-------");
+                                System.exit(-1);
+                            }
+                            user.save();
+                            editor.putString("loggedInId", Long.toString(user.getId()));
+                            editor.commit();
+                            Intent intent = new Intent(currContext, MainActivity.class);
+                            startActivity(intent);
                         }
                     });
                 }
 
                 @Override
-                public void onRequestFailed(String message) {
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
 
                 }
             });

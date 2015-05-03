@@ -2,6 +2,7 @@ package com.example.hjcyz1991.project407;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -133,4 +134,16 @@ public class MainActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    /*public class LoadFriendshipTask extends AsyncTask<Void, Void, Boolean>{
+
+
+        @Override
+        protected Boolean doInBackground(Void... params){
+
+        }
+
+    }*/
+
 }
+
