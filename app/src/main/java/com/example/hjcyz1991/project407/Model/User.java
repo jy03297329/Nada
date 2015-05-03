@@ -46,6 +46,7 @@ public class User extends SugarRecord<User>{
     }
 
     public List<User> getFriends(){
+
         return friendship.findWithQuery(User.class, "Select friend from friendship where user = ?",
                 Long.toString(this.getId()));
         //result.addAll(friendship.find(User.class, "user2 = ?", this.getId().toString()));

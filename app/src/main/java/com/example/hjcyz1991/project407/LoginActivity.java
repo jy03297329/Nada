@@ -344,8 +344,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                 //user.authTokenConfirm = mPassword;
                                 //curUser.authTokenConfirm = mPassword;
                                 //user.save();
-                                curUser.save();
-                                Log.d(null, "new user added no problem: " + curUser.backendId);
+                                user.save();
+                                Log.d(null, "new user added no problem: " + user.backendId);
                                 editor.putString("loggedInId", Long.toString(user.getId()));
                                 editor.commit();
                                 //curUser.copy(user);
@@ -448,7 +448,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         @Override
                         public void run() {
                             //while(taskLock.isLocked()){};
-                            List<User> oldFriendshipList = curUser.getFriends();
+                            List<User> users = User.find(User.class, "backend_id = ?", new Integer(
+                                    curUser.backendId).toString());
+                            Log.d(TAG, "user size: " + users.size());
+                            List<User> oldFriendshipList = users.get(0).getFriends();
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
                             //SharedPreferences.Editor editor = prefs.edit();
                             for(User i : resultFriends){
@@ -520,7 +523,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 public void onRequestCompleted(Object result) {
                     //Log.d(null, "5");
                     final List<Bill> resultBills = (List<Bill>) result;
-                    //Log.d(TAG, "BillList get success. User: " + curUser.toString());
+                    Log.d(TAG, "BillList get success. User: " + curUser.toString());
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {

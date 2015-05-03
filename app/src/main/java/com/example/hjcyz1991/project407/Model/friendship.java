@@ -8,7 +8,7 @@ import com.orm.SugarRecord;
 public class friendship extends SugarRecord<friendship> {
     public User user;
     public User friend;
-    friendship(){
+    public friendship(){
         user = null;
         friend = null;
     }
