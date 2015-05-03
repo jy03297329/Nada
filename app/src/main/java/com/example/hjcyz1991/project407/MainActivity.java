@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.hjcyz1991.project407.Model.User;
+
 
 public class MainActivity extends ActionBarActivity {
 
@@ -27,6 +29,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     // UI references.
+    private User user;
     private TextView IOwe;
     private TextView owedMe;
     private TextView balance;
@@ -126,7 +129,7 @@ public class MainActivity extends ActionBarActivity {
                 startActivity(intentAddGroups);
                 return true;
             case R.id.action_scan_ur_code:
-                Intent intentScanURCode = new Intent(this, ScanURCode.class);
+                Intent intentScanURCode = new Intent(this, ScanQRCode.class);
                 startActivity(intentScanURCode);
                 return true;
             default:

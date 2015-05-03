@@ -3,6 +3,7 @@
 buildscript {
     repositories {
         jcenter()
+        maven{url "http://mvnrepository.com/artifact/com.paypal.sdk"}
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.0'

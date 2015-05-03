@@ -1,6 +1,7 @@
 package com.example.hjcyz1991.project407;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -11,8 +12,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.paypal.android.sdk.payments.PayPalFuturePaymentActivity;
+import com.paypal.android.sdk.payments.PayPalService;
+
 
 public class Settings extends ActionBarActivity {
+
+    private static final int REQUEST_CODE_PAYMENT = 1;
+    private static final int REQUEST_CODE_FUTURE_PAYMENT = 2;
+    private static final int REQUEST_CODE_PROFILE_SHARING = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +31,6 @@ public class Settings extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View actionbar = inflater.inflate(R.layout.actionbar, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
@@ -51,5 +57,14 @@ public class Settings extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void onFuturePaymentPressed(View pressed) {
+        Intent intent = new Intent(this, PayPalFuturePaymentActivity.class);
+
+        // send the same configuration for restart resiliency
+        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+
+        startActivityForResult(intent, REQUEST_CODE_FUTURE_PAYMENT);
     }
 }

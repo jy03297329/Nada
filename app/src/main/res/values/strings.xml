@@ -17,7 +17,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_add_groups">AddGroups</string>
-    <string name="title_activity_scan_urcode">ScanURCode</string>
+    <string name="title_activity_scan_qrcode">ScanURCode</string>
     <string name="title_activity_add_new_bill">AddNewBill</string>
     <string name="title_activity_pay_back">PayBack</string>
     <string name="title_activity_send_reminder">SendReminder</string>

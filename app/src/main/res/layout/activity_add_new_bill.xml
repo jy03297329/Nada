@@ -39,6 +39,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/people_edit"
+            android:hint="@string/people_hint"
+            android:textSize="16sp"
             />
     </LinearLayout>
     <LinearLayout
@@ -91,7 +93,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/i_pay"
             android:text="@string/i_pay"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:onClick="showDialog"/>
 
         </LinearLayout>
 

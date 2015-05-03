@@ -12,7 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 
-public class ScanURCode extends ActionBarActivity {
+public class ScanQRCode extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

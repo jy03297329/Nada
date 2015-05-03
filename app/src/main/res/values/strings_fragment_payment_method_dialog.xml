@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="payment_method_text">How would you like to pay?</string>
+    <string name="cash_button_text">By Cash</string>
+    <string name="paypal_button_text">By PayPal</string>
+</resources>

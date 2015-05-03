@@ -5,6 +5,9 @@
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar"/>
     <style name="AppTheme" parent="AppBaseTheme">
         <item name="actionOverflowMenuStyle">@style/OverflowMenu</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
     </style>
     <style name="OverflowMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
         <!-- Required for pre-Lollipop. -->

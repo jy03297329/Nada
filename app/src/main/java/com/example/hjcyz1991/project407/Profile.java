@@ -23,8 +23,6 @@ public class Profile extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_profile, menu);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View actionbar = inflater.inflate(R.layout.actionbar, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
