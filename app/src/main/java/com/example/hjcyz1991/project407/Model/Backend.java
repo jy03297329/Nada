@@ -86,43 +86,6 @@ public class Backend {
                 callback.onRequestFailed(handleFailure(getContent()));
             }
         });
-
-        //StringEntity jsonParams = null;
-        /*try {
-            JSONObject json = new JSONObject();
-            Log.d(null, "User backendId: " + curUser.backendId);
-            json.put("cur_user_id", curUser.backendId);
-            json.put("password", curUser.authToken);
-            jsonParams = new StringEntity(json.toString());
-            Log.d(null, "checking friend posts");
-            Log.d(null, json.toString());
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        client.post("friendships/friend_list", jsonParams, headers,
-                new JsonResponseHandler() {
-                    @Override
-                    public void onSuccess() {
-                        JsonArray friendList = getContent().getAsJsonArray();
-                        for (JsonElement element : friendList) {
-                            JsonObject friend = element.getAsJsonObject();
-                            friend.addProperty("backendId", friend.get("id").toString());
-                            friend.remove("id");
-                            Gson gson = new Gson();
-                            User newFriend = gson.fromJson(friend, User.class);
-                            curUser.friends.add(newFriend);
-                            Log.d(null, "Backend: curUser id: " + curUser.backendId);
-                        }
-                        callback.onRequestCompleted(curUser);
-                    }
-
-                    @Override
-                    public void onFailure() {
-                        Log.d(null, "trying to get friend list");
-                        Log.d(null, "failed");
-                        callback.onRequestFailed(handleFailure(getContent()));
-                    }
-                });*/
     }
 
     public static void loadUserFriends(final User user, final BackendCallback callback){

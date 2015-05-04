@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
  * Created by hjcyz1991 on 5/3/15.
  */
 public class SaveSharedPreference {
-    static final String PREF_USER_NAME= "username";
+    static final String PREF_USER_NAME= "loggedInId";
 
     static SharedPreferences getSharedPreferences(Context ctx) {
         return PreferenceManager.getDefaultSharedPreferences(ctx);

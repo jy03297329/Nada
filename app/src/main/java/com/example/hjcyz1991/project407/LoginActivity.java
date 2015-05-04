@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
@@ -47,7 +48,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     private class Lock{
         private boolean locker;
-        Lock(){ locker = true;}
+        Lock(){ locker = false;}
         public boolean isLocked(){ return locker;}
         public void release(){  locker = false;}
         public void lock(){ locker = true;}
@@ -102,7 +103,15 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(loadLock.isLocked()){
+                    //mAuthTask.cancel(true);
+                    mFriendTask.cancel(true);
+                    mBillTask.cancel(true);
+                    if(mFriendTask == null)
+                        Log.d(null, "friendTask cancelled");
+                }
                 attemptLogin();
+
             }
         });
 
@@ -180,19 +189,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             InputMethodManager inputManager = (InputMethodManager)
                     this.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.toggleSoftInput(0, 0);
+            Log.d(null, "try login");
             loadLock.lock();
-            //friendLock.lock();
-            //billLock.lock();
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
-            //while (curUser.backendId == 0){}
-            //Log.d(null, "0");
-            //while(taskLock.isLocked()){};
-            //taskLock.lock();
+            Log.d(null, "try login2");
             mFriendTask = new LoadUserFriendTask();
             mFriendTask.execute((Void) null);
-            //while(taskLock.isLocked()){};
-            //taskLock.lock();
             mBillTask = new LoadUserBillTask();
             mBillTask.execute();
 
@@ -306,10 +309,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         private final String mEmail;
         private final String mPassword;
         //private final User curUser;
+        //private final ProgressDialog progressDialog;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
+            //progressDialog = gimmeOne
+
             //curUser = new User();
         }
 
@@ -319,16 +325,16 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             final String TAG = "LOGIN_ACTIVITY";
             final Context currContext = LoginActivity.this;
             //curUser = new User();
+
             Backend.logIn(mEmail, mPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
-
                     final User user = (User) result;
                     SaveSharedPreference.setUserName(LoginActivity.this, user.email);
                     curUser.copy(user);
+                    Log.d(TAG, "curUser: " + curUser.toString());
                     //Log.d(TAG, "Login success. User: " + user.toString());
                     Log.d(TAG, "Login success. curUser: " + curUser.toString());
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -336,20 +342,16 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             //check db for user with existing backendId. If doesn't exit, then save
                             List<User> users = User.find(User.class, "backend_id = ?", new Integer(
                                     user.backendId).toString());
-                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
-                            SharedPreferences.Editor editor = prefs.edit();
+                            //SaveSharedPreference prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
+                            //SharedPreferences.Editor editor = prefs.edit();
 
                             if (users.size() == 0) {
                                 Log.d(null, "new user: " + user.toString());
-                                //user.authToken = mPassword;
-                                //curUser.authToken = mPassword;
-                                //user.authTokenConfirm = mPassword;
-                                //curUser.authTokenConfirm = mPassword;
-                                //user.save();
                                 user.save();
                                 Log.d(null, "new user added no problem: " + user.backendId);
-                                editor.putString("loggedInId", Long.toString(user.getId()));
-                                editor.commit();
+                                SaveSharedPreference.setUserName(currContext, Integer.toString(user.backendId));
+                                //editor.putString("loggedInId", Integer.toString(user.backendId));
+                                //editor.commit();
                                 //curUser.copy(user);
 
                             } else {
@@ -370,8 +372,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                                 tempUser.save();
                                 curUser.copy(tempUser);
-                                editor.putString("loggedInId", Long.toString(tempUser.getId()));
-                                editor.commit();
+                                SaveSharedPreference.setUserName(currContext, Integer.toString(user.backendId));
+                                //editor.putString("loggedInId", Long.toString(tempUser.getId()));
+                                //editor.commit();
 
                             }
                             loadLock.release();
@@ -393,6 +396,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
                     });
+
                 }
             });
 
@@ -410,7 +414,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         protected void onPostExecute(final Boolean success) {
             //Log.d(null, "2");
             mAuthTask = null;
-            showProgress(true);
+            showProgress(false);
             if (!success){
 
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -492,15 +496,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             showProgress(true);
 
             if (success) {
-                //Log.d(null, "1");
-                //String email = mEmailView.getText().toString();
-                //String password = mPasswordView.getText().toString();
-                //mAuthTask = new UserLoginTask(email, password);
-                //mAuthTask.execute((Void) null);
-                //finish();
             } else {
-                //mPasswordView.setError(getString(R.string.error_incorrect_password));
-                //mPasswordView.requestFocus();
             }
         }
 
@@ -515,8 +511,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
+
             final String TAG = "LOGIN_ACTIVITY_LB";
             final Context currContext = LoginActivity.this;
+            Log.d(TAG, "billTask in");
             while (loadLock.isLocked()){};
             Backend.loadUserBill(curUser, new Backend.BackendCallback() {
                 @Override
@@ -549,8 +547,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                     }
                                 }
                             }
+
+                            Log.d(TAG, "move on to main");
                             Intent intent = new Intent(currContext, MainActivity.class);
-                            
+                            intent.putExtra("currentUser", curUser.backendId);
                             startActivity(intent);
                             finish();
                         }
