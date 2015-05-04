@@ -6,16 +6,21 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,6 +31,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.hjcyz1991.project407.Model.*;
+
+import org.apache.http.entity.StringEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +56,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
+    private UserRegistrationTask mAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -126,6 +136,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
+        String name = firstName.getText().toString() + " " + lastName.getText().toString();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
         String passwordConfirm = mPasswordViewConfirm.getText().toString();
@@ -165,7 +176,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserRegistrationTask(name, email, password, passwordConfirm);
             mAuthTask.execute((Void) null);
         }
     }
@@ -277,34 +288,66 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserRegistrationTask extends AsyncTask<Void, Void, Boolean> {
 
+        private final String mName;
         private final String mEmail;
         private final String mPassword;
+        private final String mConPassword;
 
-        UserLoginTask(String email, String password) {
+        UserRegistrationTask(String name, String email, String password, String conPassword) {
+            mName = name;
             mEmail = email;
             mPassword = password;
+            mConPassword = conPassword;
+
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
+            final String TAG = "REGISTRATION";
+            final Context currContext = Registration.this;
+            Log.d(null, "name: " + mName + "email: " + mEmail);
+            Backend.register(mName, mEmail, mPassword, mConPassword, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    final User user = (User) result;
+                    Log.d(TAG, "Login success. User: " + user.toString());
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            List<User> users = User.find(User.class, "backend_id = ?", new Integer(
+                                    user.backendId).toString());
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            if(users.size() != 0){
+                                Log.d(null, "------local db error: already having" +
+                                        " new item-------");
+                                System.exit(-1);
+                            }
+                            user.save();
+                            editor.putString("loggedInId", Long.toString(user.getId()));
+                            editor.commit();
+                            Intent intent = new Intent(currContext, MainActivity.class);
+                            startActivity(intent);
+                        }
+                    });
                 }
-            }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                }
+            });
 
             // TODO: register the new account here.
             return true;

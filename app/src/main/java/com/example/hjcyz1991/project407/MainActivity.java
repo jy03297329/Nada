@@ -2,6 +2,7 @@ package com.example.hjcyz1991.project407;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -40,6 +41,8 @@ public class MainActivity extends ActionBarActivity {
     private Button viewBills;
     private Button profile;
     private Button settings;
+    private final int LOGGED_OUT = 1;
+    private final int NOT_LOGGED_OUT = 0;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -105,7 +108,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, Settings.class);
-                startActivity(intent);
+                startActivityForResult(intent, LOGGED_OUT);
             }
         });
         return super.onCreateOptionsMenu(menu);
@@ -136,4 +139,12 @@ public class MainActivity extends ActionBarActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == LOGGED_OUT){
+            finish();
+        }
+    }
+
 }
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Nada.iml" filepath="$PROJECT_DIR$/Nada.iml" />
+<<<<<<< HEAD
+      <module fileurl="file://$PROJECT_DIR$/libs/PayPalAndroidSDK-2.9.3.jar/PayPalAndroidSDK-2.9.3.jar.iml" filepath="$PROJECT_DIR$/libs/PayPalAndroidSDK-2.9.3.jar/PayPalAndroidSDK-2.9.3.jar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Project407.iml" filepath="$PROJECT_DIR$/Project407.iml" />
+=======
+>>>>>>> 874a791e014cd4596339bd85b763898fbd21695b
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+    </modules>
+  </component>
+</project>
+

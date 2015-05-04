@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.paypal.android.sdk.payments.PayPalFuturePaymentActivity;
@@ -21,11 +22,25 @@ public class Settings extends ActionBarActivity {
     private static final int REQUEST_CODE_PAYMENT = 1;
     private static final int REQUEST_CODE_FUTURE_PAYMENT = 2;
     private static final int REQUEST_CODE_PROFILE_SHARING = 3;
+    private final int LOGGED_OUT = 1;
+
+    Button logout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        logout = (Button)findViewById(R.id.logout);
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SaveSharedPreference.clearUserName(Settings.this);
+                Intent intent = new Intent(Settings.this, LoginActivity.class);
+                startActivity(intent);
+                setResult(LOGGED_OUT);
+                finish();
+            }
+        });
     }
 
 
@@ -63,7 +78,7 @@ public class Settings extends ActionBarActivity {
         Intent intent = new Intent(this, PayPalFuturePaymentActivity.class);
 
         // send the same configuration for restart resiliency
-        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
 
         startActivityForResult(intent, REQUEST_CODE_FUTURE_PAYMENT);
     }

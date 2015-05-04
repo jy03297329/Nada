@@ -7,6 +7,9 @@
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -20,6 +23,26 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
+    <!-- hardware features -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false"/>
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false"/>
+
+    <!-- for card.io card scanning -->
+    <uses-permission
+        android:name="android.permission.CAMERA"/>
+    <uses-permission
+        android:name="android.permission.VIBRATE"/>
+
+    <!-- for most things, including card.io & paypal -->
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE"/>
+
     <application
         android:name="com.orm.SugarApp"
         android:allowBackup="true"
@@ -29,7 +52,7 @@
         android:theme="@style/AppTheme" >
 =======
         android:theme="@style/AppTheme">
->>>>>>> 6e9aa1dcdc579ea9a0d121a3684312e7b3feac97
+>>>>>>> 874a791e014cd4596339bd85b763898fbd21695b
 
         <!-- Sugar specific setup (the ORM library) -->
         <meta-data
@@ -49,6 +72,12 @@
             android:name=".LoginActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+
         </activity>
         <activity
             android:name=".Registration"
@@ -58,11 +87,11 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title" >
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".AddFriends"
@@ -82,8 +111,8 @@
                 android:value="com.example.hjcyz1991.project407.MainActivity" />
         </activity>
         <activity
-            android:name=".ScanURCode"
-            android:label="@string/title_activity_scan_urcode"
+            android:name=".ScanQRCode"
+            android:label="@string/title_activity_scan_qrcode"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -137,6 +166,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.hjcyz1991.project407.MainActivity" />
         </activity>
+
+        <activity android:name="com.paypal.android.sdk.payments.PayPalProfileSharingActivity" />
+        <activity android:name="com.paypal.android.sdk.payments.ProfileSharingConsentActivity" />
+        <activity android:name="com.paypal.android.sdk.payments.FuturePaymentInfoActivity" />
+        <activity android:name="com.paypal.android.sdk.payments.LoginActivity" />
+        <activity android:name="com.paypal.android.sdk.payments.PayPalTouchActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <service android:name="com.paypal.android.sdk.payments.PayPalService"
+            android:exported="false" />
     </application>
 
 </manifest>

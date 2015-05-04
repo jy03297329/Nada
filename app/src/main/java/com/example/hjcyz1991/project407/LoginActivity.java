@@ -26,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -39,24 +40,28 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * A login screen that offers login via email/password.
- */
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private UserLoginTask mAuthTask = null;
 
+    private class Lock{
+        private boolean locker;
+        Lock(){ locker = true;}
+        public boolean isLocked(){ return locker;}
+        public void release(){  locker = false;}
+        public void lock(){ locker = true;}
+    }
+
+    private UserLoginTask mAuthTask = null;
+    private LoadUserFriendTask mFriendTask = null;
+    private LoadUserBillTask mBillTask = null;
+    private final User curUser = new User();
+    private Lock loadLock = new Lock();
+    //private Lock Lock = new Lock();
+    //private Lock billLock = new Lock();
+    //private boolean lockFriend = true;
+    //private boolean lockBill = true;
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -67,6 +72,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //If user has logged in is not signed out go to Main
+        if(SaveSharedPreference.getUserName(this).length() != 0){
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -78,7 +90,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if ( id == R.id.login || id == EditorInfo.IME_NULL) {
+                if (id == R.id.login || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
@@ -164,8 +176,26 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+            //hide keyboard
+            InputMethodManager inputManager = (InputMethodManager)
+                    this.getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputManager.toggleSoftInput(0, 0);
+            loadLock.lock();
+            //friendLock.lock();
+            //billLock.lock();
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
+            //while (curUser.backendId == 0){}
+            //Log.d(null, "0");
+            //while(taskLock.isLocked()){};
+            //taskLock.lock();
+            mFriendTask = new LoadUserFriendTask();
+            mFriendTask.execute((Void) null);
+            //while(taskLock.isLocked()){};
+            //taskLock.lock();
+            mBillTask = new LoadUserBillTask();
+            mBillTask.execute();
+
         }
     }
 
@@ -275,10 +305,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         private final String mEmail;
         private final String mPassword;
+        //private final User curUser;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
+            //curUser = new User();
         }
 
         @Override
@@ -286,42 +318,65 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // TODO: attempt authentication against a network service.
             final String TAG = "LOGIN_ACTIVITY";
             final Context currContext = LoginActivity.this;
+            //curUser = new User();
             Backend.logIn(mEmail, mPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
 
                     final User user = (User) result;
-                    //if(result == null) Log.d(null, "empty");
-                    Log.d(TAG, "Login success. User: " + user.toString());
+                    SaveSharedPreference.setUserName(LoginActivity.this, user.email);
+                    curUser.copy(user);
+                    //Log.d(TAG, "Login success. User: " + user.toString());
+                    Log.d(TAG, "Login success. curUser: " + curUser.toString());
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            //taskLock.release();
                             //check db for user with existing backendId. If doesn't exit, then save
                             List<User> users = User.find(User.class, "backend_id = ?", new Integer(
                                     user.backendId).toString());
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
                             SharedPreferences.Editor editor = prefs.edit();
-                            //Log.d(null, "backendId check");
-                            if(users.size() == 0){
+
+                            if (users.size() == 0) {
                                 Log.d(null, "new user: " + user.toString());
+                                //user.authToken = mPassword;
+                                //curUser.authToken = mPassword;
+                                //user.authTokenConfirm = mPassword;
+                                //curUser.authTokenConfirm = mPassword;
+                                //user.save();
                                 user.save();
-                                Log.d(null, "no problem");
+                                Log.d(null, "new user added no problem: " + user.backendId);
                                 editor.putString("loggedInId", Long.toString(user.getId()));
                                 editor.commit();
+                                //curUser.copy(user);
+
                             } else {
-                                User currUser = users.get(0);
-                                Log.d(null, "curr user: " + currUser.toString());
-                                currUser.authToken = user.authToken;
-                                currUser.authTokenConfirm = user.authTokenConfirm;
-                                //currUser.tokenExpiration = user.tokenExpiration;
-                                currUser.save();
-                                editor.putString("loggedInId", Long.toString(currUser.getId()));
+                                final User tempUser = users.get(0);
+                                //tempUser.friends.clear();
+                                //tempUser.friends.addAll(user.friends);
+                                if(tempUser.backendId != user.backendId) {
+                                    Log.d(null, "backendId somehow changed!");
+                                    tempUser.backendId = user.backendId;
+                                }
+                                //Log.d(null, "currUser backendId: " + tempUser.backendId);
+                                tempUser.authToken = mPassword;
+                                //curUser.authToken = mPassword;
+                                tempUser.authTokenConfirm = mPassword;
+                                //curUser.authTokenConfirm = mPassword;
+                                //Log.d(null, "curr user: " + tempUser.toString());
+                                //Log.d(null, "****" + tempUser.authToken.toString());
+
+                                tempUser.save();
+                                curUser.copy(tempUser);
+                                editor.putString("loggedInId", Long.toString(tempUser.getId()));
                                 editor.commit();
 
                             }
-                            Intent intent = new Intent(currContext, MainActivity.class);
-                            startActivity(intent);
+                            loadLock.release();
+                            //Intent intent = new Intent(currContext, MainActivity.class);
+                            //startActivity(intent);
                         }
                     });
                 }
@@ -341,19 +396,196 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 }
             });
 
-                return true;
-            }
 
-            @Override
+            /* Quest local database if info of the user has been stored
+             * if not, get from server and store it.
+             */
+
+            //lockLogin = true;
+            // TODO: register the new account here.
+            return true;
+        }
+
+        @Override
         protected void onPostExecute(final Boolean success) {
+            //Log.d(null, "2");
             mAuthTask = null;
-            showProgress(false);
+            showProgress(true);
+            if (!success){
 
-            if (success) {
-                finish();
-            } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    //one more class to load the bill
+    public class LoadUserFriendTask extends AsyncTask<Void, Void, Boolean>{
+        //private final User curUser;
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            final String TAG = "LOGIN_ACTIVITY_LF";
+            final Context currContext = LoginActivity.this;
+            while(loadLock.isLocked()){};
+            Backend.loadUserFriends(curUser, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    //Log.d(null, "5");
+                    final List<User> resultFriends = (List<User>) result;
+                    //Log.d(TAG, "FriendList get success. Original: " + resultUser.toString());
+                    //curUser.friends.clear();
+                    //Log.d(TAG, "FriendList get success. Original: " + resultUser.toString());
+                    //curUser.friends.addAll(resultUser.friends);
+                    //Log.d(TAG, "FriendList get success. Original: " + resultUser.toString());
+                    Log.d(TAG, "FriendList get success. User: " + curUser.toString());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //while(taskLock.isLocked()){};
+                            List<User> users = User.find(User.class, "backend_id = ?", new Integer(
+                                    curUser.backendId).toString());
+                            Log.d(TAG, "user size: " + users.size());
+                            List<User> oldFriendshipList = users.get(0).getFriends();
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
+                            //SharedPreferences.Editor editor = prefs.edit();
+                            for(User i : resultFriends){
+                                if(!oldFriendshipList.contains(i)){
+                                    friendship newFriend = new friendship(curUser, i);
+                                    newFriend.save();
+                                    Log.d(TAG, "new friend: " + i.toString());
+                                }
+
+                            }
+                            //Log.d(null, "user friendList updated:\n" + user.toString());
+                            //Log.d(null, "user saved: \n" + users.get(0).toString());
+                            //Intent intent = new Intent(currContext, MainActivity.class);
+                            //startActivity(intent);
+                            //friendLock.release();
+                        }
+                    });
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+            //lockFriend = false;
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+            showProgress(true);
+
+            if (success) {
+                //Log.d(null, "1");
+                //String email = mEmailView.getText().toString();
+                //String password = mPasswordView.getText().toString();
+                //mAuthTask = new UserLoginTask(email, password);
+                //mAuthTask.execute((Void) null);
+                //finish();
+            } else {
+                //mPasswordView.setError(getString(R.string.error_incorrect_password));
+                //mPasswordView.requestFocus();
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            mAuthTask = null;
+            showProgress(false);
+        }
+    }
+
+    public class LoadUserBillTask extends AsyncTask<Void, Void, Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            final String TAG = "LOGIN_ACTIVITY_LB";
+            final Context currContext = LoginActivity.this;
+            while (loadLock.isLocked()){};
+            Backend.loadUserBill(curUser, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    //Log.d(null, "5");
+                    final List<Bill> resultBills = (List<Bill>) result;
+                    Log.d(TAG, "BillList get success. User: " + curUser.toString());
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //while(taskLock.isLocked()){};
+                            //final Bill resultBill = (Bill) result;
+                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
+                            //SharedPreferences.Editor editor = prefs.edit();
+                            for(Bill i : resultBills){
+                                if(i.settled){
+                                    if(!curUser.getBillSettled().contains(i)){
+                                        i.save();
+                                        Log.d(TAG, "new settled bill: " + i.toString());
+                                    }
+                                }else if(i.debtor_id == curUser.backendId){
+                                    if(!curUser.getBillPay().contains(i)){
+                                        i.save();
+                                        Log.d(TAG, "new debted bill: " + i.toString());
+                                    }
+                                }else if(i.creditor_id == curUser.backendId){
+                                    if(!curUser.getBillRec().contains(i)){
+                                        i.save();
+                                        Log.d(TAG, "new credited bill: " + i.toString());
+                                    }
+                                }
+                            }
+                            Intent intent = new Intent(currContext, MainActivity.class);
+                            
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            mAuthTask = null;
+            showProgress(true);
+
+            if (success) {
+                Log.d(null, "1");
+                //String email = mEmailView.getText().toString();
+                //String password = mPasswordView.getText().toString();
+                //mAuthTask = new UserLoginTask(email, password);
+                //mAuthTask.execute((Void) null);
+                //finish();
+            } else {
+                //mPasswordView.setError(getString(R.string.error_incorrect_password));
+                //mPasswordView.requestFocus();
             }
         }
 
