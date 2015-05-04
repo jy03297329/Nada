@@ -75,6 +75,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         //If user has logged in is not signed out go to Main
         if(SaveSharedPreference.getUserName(this).length() != 0){
             Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("userBackendID", curUser.backendId);
             startActivity(intent);
             finish();
         }
@@ -550,7 +551,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                 }
                             }
                             Intent intent = new Intent(currContext, MainActivity.class);
-                            
+                            intent.putExtra("userBackendID", curUser.backendId);
                             startActivity(intent);
                             finish();
                         }

@@ -21,19 +21,19 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/I_owe"
-        android:text="@string/title"
+        android:text="@string/i_owe_text"
         android:layout_weight="1"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/owed_me"
-        android:text="@string/title"
+        android:text="@string/owe_me_text"
         android:layout_weight="1"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/balance"
-        android:text="@string/title"
+        android:text="@string/balance_text"
         android:layout_weight="1"/>
     </LinearLayout>
 

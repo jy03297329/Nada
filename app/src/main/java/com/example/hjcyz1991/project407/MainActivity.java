@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.hjcyz1991.project407.Model.User;
+import com.google.gson.Gson;
+
+import java.io.IOError;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -30,7 +35,6 @@ public class MainActivity extends ActionBarActivity {
     }
 
     // UI references.
-    private User user;
     private TextView IOwe;
     private TextView owedMe;
     private TextView balance;
@@ -42,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
     private Button profile;
     private Button settings;
     private final int LOGGED_OUT = 1;
-    private final int NOT_LOGGED_OUT = 0;
+    public User user;
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -57,6 +61,22 @@ public class MainActivity extends ActionBarActivity {
         actionbarTitle.setText("Nada");
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(actionbar, params);
+
+        //Get user
+        int userBackendID = getIntent().getIntExtra("userBackendID", 0);
+        Log.d("backendID", Integer.toString(userBackendID));
+        List<User> users = User.find(User.class, "backend_id = ?", Integer.toString(userBackendID));
+        user = users.get(0);
+
+        IOwe = (TextView)findViewById(R.id.I_owe);
+        IOwe.setText("Payable: " + Double.toString(user.moneyPay));
+
+        owedMe = (TextView) findViewById(R.id.owe_me);
+        owedMe.setText("Receivable: $0.00");
+//        owedMe.setText("Receivable: " + Double.toString(user.moneyRec));
+
+        balance = (TextView) findViewById(R.id.balance);
+        balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));
 
         addNewBill = (Button) findViewById(R.id.add_new_bill);
         addNewBill.setOnClickListener(new View.OnClickListener() {
