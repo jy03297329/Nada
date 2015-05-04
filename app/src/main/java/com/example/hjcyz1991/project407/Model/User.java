@@ -85,8 +85,10 @@ public class User extends SugarRecord<User>{
         billSettled.addAll(user.billSettled);*/
         //eventPay.addAll(user.eventPay);
         //eventRec.addAll(user.eventRec);
-        moneyPay = user.moneyPay;
+//        if(user.moneyRec != null)
         moneyRec = user.moneyRec;
+
+        moneyPay = user.moneyPay;
     }
 
 

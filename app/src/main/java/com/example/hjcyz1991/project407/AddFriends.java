@@ -9,15 +9,21 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 
 public class AddFriends extends ActionBarActivity {
 
+    EditText search;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friends);
+        search = (EditText)findViewById(R.id.search);
+        //get value user typed in the search box
+        String searchVal = search.getText().toString();
     }
 
 
