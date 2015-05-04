@@ -13,29 +13,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.hjcyz1991.project407.Model.Bill;
 import com.example.hjcyz1991.project407.Model.User;
+import com.google.gson.Gson;
+
+import java.io.IOError;
+import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-    }
-
-    // UI references.
-    private User user;
+    public User user; // UI references.
     private TextView IOwe;
     private TextView owedMe;
     private TextView balance;
-    private TextView textViewBills;
+    private ListView listViewBills;
     private Button addNewBill;
     private Button payBack;
     private Button sendReminder;
@@ -43,7 +43,33 @@ public class MainActivity extends ActionBarActivity {
     private Button profile;
     private Button settings;
     private final int LOGGED_OUT = 1;
-    private final int NOT_LOGGED_OUT = 0;
+//    private Bill[] bills;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        //Get user
+        String userBackendID = SaveSharedPreference.getUserName(this);
+        List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
+        user = users.get(0);
+
+        listViewBills = (ListView) findViewById(R.id.list_view_bills);
+
+        IOwe = (TextView)findViewById(R.id.I_owe);
+        IOwe.setText("Payable: $" + Double.toString(user.moneyPay));
+
+        owedMe = (TextView) findViewById(R.id.owed_me);
+        owedMe.setText("Receivable: $" + Double.toString(user.moneyRec));
+
+        balance = (TextView) findViewById(R.id.balance);
+        balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));
+
+        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers" };
+        ArrayAdapter<String> ListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+
+        listViewBills.setAdapter(ListAdapter);
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -59,6 +85,7 @@ public class MainActivity extends ActionBarActivity {
         actionbarTitle.setText("Nada");
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setCustomView(actionbar, params);
+
 
         addNewBill = (Button) findViewById(R.id.add_new_bill);
         addNewBill.setOnClickListener(new View.OnClickListener() {

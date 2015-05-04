@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="i_owe_text">Payable: </string>
+    <string name="owe_me_text">Receivable: </string>
+    <string name="balance_text">Balance: </string>
+</resources>
