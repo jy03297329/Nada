@@ -23,8 +23,8 @@ public class User extends SugarRecord<User>{
     public String authToken;
     public String authTokenConfirm;
     public Date tokenExpiration;
-    public HashSet<BillEvent> eventPay;
-    public HashSet<BillEvent> eventRec;
+    //public HashSet<BillEvent> eventPay;
+    //public HashSet<BillEvent> eventRec;
 
     public double moneyPay;
     public double moneyRec;

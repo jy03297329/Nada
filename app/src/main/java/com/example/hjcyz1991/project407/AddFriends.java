@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 public class AddFriends extends ActionBarActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,5 +51,10 @@ public class AddFriends extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    public void searchFriend(){
+
     }
 }
