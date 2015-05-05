@@ -17,7 +17,7 @@ public class ScanQRCode extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_scan_urcode);
+        setContentView(R.layout.activity_scan_qrcode);
     }
 
 

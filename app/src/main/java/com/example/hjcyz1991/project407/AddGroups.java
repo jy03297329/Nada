@@ -11,22 +11,36 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 
 public class AddGroups extends ActionBarActivity {
 
+    private ListView contacts;
+    private Button group;
+    private Button cancel;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_groups);
+        contacts = (ListView)findViewById(R.id.contact_listView);
 
-        FragmentManager fm = getFragmentManager();
+        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, items);
 
-        if (fm.findFragmentById(android.R.id.content) == null) {
-            ContactFragment list = new ContactFragment();
-            fm.beginTransaction().add(android.R.id.content, list).commit();
-        }
+        contacts.setAdapter(arrayAdapter);
+        cancel = (Button)findViewById(R.id.button_cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
 
     }
@@ -62,8 +76,8 @@ public class AddGroups extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onFragmentInteraction(String id){
-        ContactFragment contactFragment = (ContactFragment)
-                getFragmentManager().findFragmentById(R.id.fragment);
-    }
+//    public void onFragmentInteraction(String id){
+//        ContactFragment contactFragment = (ContactFragment)
+//                getFragmentManager().findFragmentById(R.id.fragment);
+//    }
 }

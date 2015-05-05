@@ -52,7 +52,7 @@ public class MainActivity extends ActionBarActivity {
         //Get user
         String userBackendID = SaveSharedPreference.getUserName(this);
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
-        user = users.get(0);
+        /*user = users.get(0);
 
         listViewBills = (ListView) findViewById(R.id.list_view_bills);
 
@@ -63,12 +63,12 @@ public class MainActivity extends ActionBarActivity {
         owedMe.setText("Receivable: $" + Double.toString(user.moneyRec));
 
         balance = (TextView) findViewById(R.id.balance);
-        balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));
+        balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));*/
 
-        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers" };
+        ArrayAdapter<String> ListAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
 
-        listViewBills.setAdapter(arrayAdapter);
+        //listViewBills.setAdapter(ListAdapter);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -156,10 +156,10 @@ public class MainActivity extends ActionBarActivity {
                 Intent intentAddFriends = new Intent(this, AddFriends.class);
                 startActivity(intentAddFriends);
                 return true;
-//            case R.id.action_add_groups:
-//                Intent intentAddGroups = new Intent(this, AddGroups.class);
-//                startActivity(intentAddGroups);
-//                return true;
+            case R.id.action_add_groups:
+                Intent intentAddGroups = new Intent(this, AddGroups.class);
+                startActivity(intentAddGroups);
+                return true;
             case R.id.action_scan_ur_code:
                 Intent intentScanURCode = new Intent(this, ScanQRCode.class);
                 startActivity(intentScanURCode);

@@ -12,7 +12,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/search"
-    android:hint="@string/search_hints"/>
+    android:hint="@string/payback_search_hints"/>
     
 <ScrollView
     android:layout_width="match_parent"

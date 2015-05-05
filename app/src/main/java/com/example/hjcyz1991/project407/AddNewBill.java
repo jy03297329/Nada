@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,9 @@ import com.paypal.android.sdk.payments.PaymentActivity;
 
 
 public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog.Communicator {
+    Button addContact;
+    Button iAsk;
+    Button iPay;
 
     // Can be NO_NETWORK for OFFLINE, SANDBOX for TESTING and LIVE for PRODUCTION
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
@@ -48,13 +52,21 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_add_new_bill);
+        setContentView(R.layout.activity_add_new_bill);
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_add_new_bill)
                 .setSwipeBackView(R.layout.swipeback_default);
-        Intent intent = new Intent(this, PayPalService.class);
-        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-        startService(intent);
+//        Intent intent = new Intent(this, PayPalService.class);
+//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
+//        startService(intent);
+        addContact = (Button) findViewById(R.id.button_add_contact);
+        addContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AddNewBill.this, AddGroups.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -101,6 +113,5 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     @Override
     public void onDialogMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
     }
 }

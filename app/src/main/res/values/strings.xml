@@ -11,10 +11,8 @@
 <string name="setting_button">Settings</string>
 <string name="action_add_friends">Add Friends</string>
 <string name="action_add_groups">Add Groups</string>
-<string name="action_scan_ur_code">Scan UR Code</string>
+<string name="action_scan_ur_code">Scan QR Code</string>
 <string name="title_activity_add_friends">AddFriends</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_add_groups">AddGroups</string>
     <string name="title_activity_scan_qrcode">ScanURCode</string>

@@ -4,16 +4,23 @@ import android.content.Context;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
 
 public class AddFriends extends ActionBarActivity {
+
+    EditText searchBox;
+    View focusView = null;
+    Boolean cancel = false;
 
     EditText search;
 
@@ -22,9 +29,35 @@ public class AddFriends extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_friends);
-        search = (EditText)findViewById(R.id.search);
+        searchBox = (EditText)findViewById(R.id.search);
+        searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.search_friends || id == EditorInfo.IME_NULL) {
+                    //Get search value
+                    String searchVal = searchBox.getText().toString();
+                    //Validate input
+                    if (TextUtils.isEmpty(searchVal)) {
+                        searchBox.setError(getString(R.string.error_field_required));
+                        focusView = searchBox;
+                        cancel = true;
+                    } else if (!isEmailValid(searchVal)) {
+                        searchBox.setError(getString(R.string.error_invalid_email));
+                        focusView = searchBox;
+                        cancel = true;
+                    }
+                    if(cancel){
+                        focusView.requestFocus();
+                    }
+                    System.out.println(searchVal);
+                    return true;
+                }
+                return false;
+            }
+        });
         //get value user typed in the search box
-        String searchVal = search.getText().toString();
+        String searchVal = searchBox.getText().toString();
+        System.out.println(searchVal);
     }
 
 
@@ -58,9 +91,11 @@ public class AddFriends extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    private boolean isEmailValid(String email) {
+        return email.contains("@") && email.contains(".");
+    }
+    public void searchFriend(){
 
-
-    public void searchFriend(String email){
 
     }
 }
