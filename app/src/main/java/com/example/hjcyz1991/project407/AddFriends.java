@@ -15,10 +15,8 @@ import android.widget.TextView;
 
 public class AddFriends extends ActionBarActivity {
 
-<<<<<<< HEAD
-=======
     EditText search;
->>>>>>> 1125739a85a01471b93d5c0c5b10928d5a8987cd
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +60,7 @@ public class AddFriends extends ActionBarActivity {
     }
 
 
-    public void searchFriend(){
+    public void searchFriend(String email){
 
     }
 }
