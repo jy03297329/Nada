@@ -18,6 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/bill_name"
+            android:maxLines="1"
             android:text="@string/bill_name"/>
         <EditText
             android:layout_width="match_parent"
@@ -25,24 +26,36 @@
             android:id="@+id/bill_name_edit"
             />
         </LinearLayout>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentLeft="true"
             android:id="@+id/people"
             android:text="@string/people"/>
-        <EditText
-            android:layout_width="match_parent"
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:id="@+id/button_add_contact"
+            android:layout_alignParentRight="true" />
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/people_edit"
             android:hint="@string/people_hint"
             android:textSize="16sp"
-            />
-    </LinearLayout>
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/people"
+            android:layout_toStartOf="@id/button_add_contact"/>
+
+
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,6 +69,8 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:inputType="numberDecimal"
             android:id="@+id/total_amount_edit"
             />
     </LinearLayout>

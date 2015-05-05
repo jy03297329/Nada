@@ -37,17 +37,14 @@
         android:layout_weight="1"/>
     </LinearLayout>
 
-    <ScrollView
+
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/top_columns">
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/list_view_bills"
-            >
-        </ListView>
-        </ScrollView>
+        android:id="@+id/list_view_bills"
+        android:layout_below="@+id/top_columns"
+        android:layout_above="@+id/main_linear_layout_buttons">
+    </ListView>
 
 
     <LinearLayout

@@ -2,9 +2,9 @@
 <resources>
     <string name="bill_name">Bill Name: </string>
     <string name="people">People: </string>
-    <string name="total_amount">Total Amount: </string>
+    <string name="total_amount">Total Amount: $</string>
     <string name="note">Notes: </string>
     <string name="i_ask">I Ask</string>
     <string name="i_pay">I Pay</string>
-    <string name="people_hint">Please select only one user if you are paying</string>
+    <string name="people_hint"> Please select only one user if you are paying</string>
 </resources>
