@@ -11,7 +11,7 @@ import java.util.HashSet;
 public class BillEvent extends SugarRecord<BillEvent> {
 
     public int backendId;
-    public int userId;
+    //public int userId;
     public String password;
 
     public int creditorId;
@@ -20,7 +20,7 @@ public class BillEvent extends SugarRecord<BillEvent> {
     public String note;
     public Date created_at;
 
-    public HashSet<Bill> bills; //debtor id, amount
+    //public HashSet<Bill> bills; //debtor id, amount
 
     public double totalAmount;
 

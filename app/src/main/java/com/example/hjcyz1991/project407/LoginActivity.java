@@ -104,13 +104,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(loadLock.isLocked()){
+                /*if(loadLock.isLocked()){
                     //mAuthTask.cancel(true);
                     mFriendTask.cancel(true);
                     mBillTask.cancel(true);
                     if(mFriendTask == null)
                         Log.d(null, "friendTask cancelled");
-                }
+                }*/
                 attemptLogin();
 
             }
@@ -357,8 +357,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                             } else {
                                 final User tempUser = users.get(0);
-                                //tempUser.friends.clear();
-                                //tempUser.friends.addAll(user.friends);
                                 if(tempUser.backendId != user.backendId) {
                                     Log.d(null, "backendId somehow changed!");
                                     tempUser.backendId = user.backendId;
@@ -379,8 +377,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                             }
                             loadLock.release();
-                            //Intent intent = new Intent(currContext, MainActivity.class);
-                            //startActivity(intent);
                         }
                     });
                 }
@@ -432,6 +428,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     //one more class to load the bill
     public class LoadUserFriendTask extends AsyncTask<Void, Void, Boolean>{
+
+        LoadUserFriendTask(){
+            Log.d(null, "created a new friendTask");
+        }
         //private final User curUser;
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -509,6 +509,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     public class LoadUserBillTask extends AsyncTask<Void, Void, Boolean>{
+
+        LoadUserBillTask(){
+            Log.d(null, "created a new billTask");
+        }
 
         @Override
         protected Boolean doInBackground(Void... params) {
