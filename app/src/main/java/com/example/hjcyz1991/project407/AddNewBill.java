@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,11 +25,17 @@ import com.paypal.android.sdk.payments.PayPalConfiguration;
 import com.paypal.android.sdk.payments.PayPalService;
 import com.paypal.android.sdk.payments.PaymentActivity;
 
+import java.util.ArrayList;
+
 
 public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog.Communicator {
-    Button addContact;
-    Button iAsk;
-    Button iPay;
+    private Button addContact;
+    private Button iAsk;
+    private Button iPay;
+    private TextView peopleEdit;
+    private final int REQUEST_CODE = 0;
+    private final int CONTACTS_SELECTED = 1;
+
 
     // Can be NO_NETWORK for OFFLINE, SANDBOX for TESTING and LIVE for PRODUCTION
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
@@ -59,14 +66,32 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
 //        Intent intent = new Intent(this, PayPalService.class);
 //        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
 //        startService(intent);
+        peopleEdit = (TextView) findViewById(R.id.people_edit);
         addContact = (Button) findViewById(R.id.button_add_contact);
         addContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AddNewBill.this, AddGroups.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE);
             }
         });
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == CONTACTS_SELECTED && requestCode == REQUEST_CODE) {
+            if (data.hasExtra("contactsSelected")) {
+                Bundle bundleNames = data.getExtras().getBundle("contactsSelected");
+                Bundle bundleID = data.getExtras().getBundle("contactsSelectedID");
+                String[] resultArr = bundleNames.getStringArray("selectedItems");
+                //Selected users' ids for backend communications
+                ArrayList<Integer> selectedItemsID = bundleID.getIntegerArrayList("selectedItemsID");
+                String names = resultArr[0];
+                for(int i = 1; i < resultArr.length; i++){
+                    names = names + ", " + resultArr[i];
+                }
+                peopleEdit.setText(names);
+            }
+        }
     }
 
 
