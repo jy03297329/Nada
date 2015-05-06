@@ -54,6 +54,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         public void lock(){ locker = true;}
     }
 
+    //private boolean toBreak = false;
     private UserLoginTask mAuthTask = null;
     private LoadUserFriendTask mFriendTask = null;
     private LoadUserBillTask mBillTask = null;
@@ -101,6 +102,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         });
 
         login = (Button) findViewById(R.id.button_login);
+        //findViewById(R.id.)
         login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -195,6 +197,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
             Log.d(null, "try login2");
+            //while(curUser.backendId == 0){ if(!loadLock.isLocked()) return;};
             mFriendTask = new LoadUserFriendTask();
             mFriendTask.execute((Void) null);
             mBillTask = new LoadUserBillTask();
@@ -313,6 +316,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         //private final ProgressDialog progressDialog;
 
         UserLoginTask(String email, String password) {
+
             mEmail = email;
             mPassword = password;
             //progressDialog = gimmeOne
@@ -326,7 +330,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             final String TAG = "LOGIN_ACTIVITY";
             final Context currContext = LoginActivity.this;
             //curUser = new User();
-
+            while(!isCancelled()){
             Backend.logIn(mEmail, mPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
@@ -383,7 +387,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                 @Override
                 public void onRequestFailed(final String message) {
-
+                    mFriendTask.cancel(true);
+                    mBillTask.cancel(true);
                     //NOTE: parameter validation and filtering is handled by the backend, just show the
                     //returned error message to the user
                     Log.d(TAG, "Received error from Backend: " + message);
@@ -395,7 +400,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     });
 
                 }
-            });
+            }); return true;}
 
 
             /* Quest local database if info of the user has been stored
@@ -404,7 +409,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
             //lockLogin = true;
             // TODO: register the new account here.
-            return true;
+            return null;
         }
 
         @Override
@@ -416,11 +421,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
+
             }
         }
 
         @Override
         protected void onCancelled() {
+            Log.d(null, "on cancel is called");
             mAuthTask = null;
             showProgress(false);
         }
@@ -429,15 +436,18 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     //one more class to load the bill
     public class LoadUserFriendTask extends AsyncTask<Void, Void, Boolean>{
 
+        //private boolean running = true;
         LoadUserFriendTask(){
             Log.d(null, "created a new friendTask");
         }
         //private final User curUser;
         @Override
         protected Boolean doInBackground(Void... params) {
+            while(!isCancelled()){
             final String TAG = "LOGIN_ACTIVITY_LF";
             final Context currContext = LoginActivity.this;
-            while(loadLock.isLocked()){};
+            while(loadLock.isLocked()){if(isCancelled()) return null;};
+
             Backend.loadUserFriends(curUser, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
@@ -449,9 +459,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     //curUser.friends.addAll(resultUser.friends);
                     //Log.d(TAG, "FriendList get success. Original: " + resultUser.toString());
                     Log.d(TAG, "FriendList get success. User: " + curUser.toString());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    //runOnUiThread(new Runnable() {
+                       // @Override
+                        //public void run() {
                             //while(taskLock.isLocked()){};
                             List<User> users = User.find(User.class, "backend_id = ?", new Integer(
                                     curUser.backendId).toString());
@@ -472,8 +482,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             //Intent intent = new Intent(currContext, MainActivity.class);
                             //startActivity(intent);
                             //friendLock.release();
-                        }
-                    });
+                        //}
+                    //});
                 }
 
                 @Override
@@ -486,9 +496,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         }
                     });
                 }
-            });
+            }); return true;}
             //lockFriend = false;
-            return true;
+            return null;
         }
 
         @Override
@@ -503,6 +513,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected void onCancelled() {
+            Log.d(null, "friend on cancel is called");
+            //running = false;
             mAuthTask = null;
             showProgress(false);
         }
@@ -516,20 +528,24 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-
+            while(!isCancelled()){
             final String TAG = "LOGIN_ACTIVITY_LB";
             final Context currContext = LoginActivity.this;
-            Log.d(TAG, "billTask in");
-            while (loadLock.isLocked()){};
+
+            while (loadLock.isLocked()) {
+                if(isCancelled())
+                return null;
+            }
+                Log.d(TAG, "billTask in");
             Backend.loadUserBill(curUser, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
                     //Log.d(null, "5");
                     final List<Bill> resultBills = (List<Bill>) result;
                     Log.d(TAG, "BillList get success. User: " + curUser.toString());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    //runOnUiThread(new Runnable() {
+                      //  @Override
+                        //public void run() {
                             //while(taskLock.isLocked()){};
                             //final Bill resultBill = (Bill) result;
                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
@@ -559,8 +575,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                             startActivity(intent);
                             finish();
-                        }
-                    });
+                     //   }
+                   // });
                 }
 
                 @Override
@@ -573,8 +589,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         }
                     });
                 }
-            });
-            return true;
+            }); return true;}
+            return null;
         }
 
         @Override
@@ -583,7 +599,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             showProgress(true);
 
             if (success) {
-                Log.d(null, "1");
+                //Log.d(null, "1");
                 //String email = mEmailView.getText().toString();
                 //String password = mPasswordView.getText().toString();
                 //mAuthTask = new UserLoginTask(email, password);
@@ -597,6 +613,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected void onCancelled() {
+            Log.d(null, "bill on cancel is called");
             mAuthTask = null;
             showProgress(false);
         }

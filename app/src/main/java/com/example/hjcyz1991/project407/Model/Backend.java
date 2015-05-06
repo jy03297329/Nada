@@ -54,7 +54,7 @@ public class Backend {
         headers.add(new BasicHeader("Content-Type", "application/json"));
 
         //final User curUser = new User();
-
+        Log.d(null, "backend LOGIN called");
         client.post("users/authenticate", jsonParams, headers, new JsonResponseHandler() {
             @Override
             public void onSuccess() {
@@ -217,6 +217,50 @@ public class Backend {
                 result.remove("id");
                 Log.d(TAG, "Register returned: " + result);
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+                User user = gson.fromJson(result, User.class);
+                callback.onRequestCompleted(user);
+
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(null, "trying to post to users");
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+
+    }
+
+    public static void searchFriend(String email,
+                                    final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject userJson = new JSONObject();
+            JSONObject userData = new JSONObject();
+            userData.put("email", email);
+            //userData.put("password", password);
+            //userJson.accumulate("friend_id", friendId);
+            //userJson.wrap(userData);
+
+            //Log.d(null, "----------" + userJson.toString());
+            jsonParams = new StringEntity(userJson.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.post("users/searchuser", jsonParams, headers, new JsonResponseHandler() {
+
+            @Override
+            public void onSuccess() {
+                JsonObject result = getContent().getAsJsonObject();
+                result.addProperty("backendId", result.get("id").toString());
+                result.remove("id");
+                Log.d(TAG, "Register returned: " + result);
+                Gson gson = new Gson();
                 User user = gson.fromJson(result, User.class);
                 callback.onRequestCompleted(user);
 

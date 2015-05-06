@@ -19,15 +19,14 @@ import android.widget.TextView;
 public class AddFriends extends ActionBarActivity {
 
 <<<<<<< HEAD
+=======
     EditText searchBox;
     View focusView = null;
     Boolean cancel = false;
-=======
-<<<<<<< HEAD
-=======
+
+>>>>>>> a2a71ae92f084747e20d2d391c4a05c553d022a7
     EditText search;
->>>>>>> 1125739a85a01471b93d5c0c5b10928d5a8987cd
->>>>>>> 0db94254fc4ff95641da74eec1842d9e09208a19
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +95,16 @@ public class AddFriends extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 <<<<<<< HEAD
+
+
+    public void searchFriend(String email){
+=======
     private boolean isEmailValid(String email) {
         return email.contains("@") && email.contains(".");
-=======
-
-
+    }
     public void searchFriend(){
+>>>>>>> a2a71ae92f084747e20d2d391c4a05c553d022a7
 
->>>>>>> 0db94254fc4ff95641da74eec1842d9e09208a19
+
     }
 }
