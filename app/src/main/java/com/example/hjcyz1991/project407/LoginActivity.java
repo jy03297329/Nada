@@ -195,13 +195,17 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             Log.d(null, "try login");
             loadLock.lock();
             mAuthTask = new UserLoginTask(email, password);
+            /*{
+                @Override
+                protected void onPostExecute(Boolean success) {
+                    super.onPostExecute(success);
+                }
+            }*/
+            //mAuthTask.onPostExecute();
             mAuthTask.execute((Void) null);
-            Log.d(null, "try login2");
+            //Log.d(null, "try login2");
             //while(curUser.backendId == 0){ if(!loadLock.isLocked()) return;};
-            mFriendTask = new LoadUserFriendTask();
-            mFriendTask.execute((Void) null);
-            mBillTask = new LoadUserBillTask();
-            mBillTask.execute();
+
 
         }
     }
@@ -312,16 +316,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         private final String mEmail;
         private final String mPassword;
+
         //private final User curUser;
         //private final ProgressDialog progressDialog;
 
         UserLoginTask(String email, String password) {
-
             mEmail = email;
             mPassword = password;
-            //progressDialog = gimmeOne
-
-            //curUser = new User();
         }
 
         @Override
@@ -329,8 +330,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // TODO: attempt authentication against a network service.
             final String TAG = "LOGIN_ACTIVITY";
             final Context currContext = LoginActivity.this;
+
             //curUser = new User();
-            while(!isCancelled()){
+            //while(!isCancelled()){
             Backend.logIn(mEmail, mPassword, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
@@ -340,9 +342,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     Log.d(TAG, "curUser: " + curUser.toString());
                     //Log.d(TAG, "Login success. User: " + user.toString());
                     Log.d(TAG, "Login success. curUser: " + curUser.toString());
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                    //runOnUiThread(new Runnable() {
+                      //  @Override
+                        //public void run() {
                             //taskLock.release();
                             //check db for user with existing backendId. If doesn't exit, then save
                             List<User> users = User.find(User.class, "backend_id = ?", new Integer(
@@ -381,14 +383,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
                             }
                             loadLock.release();
-                        }
-                    });
+                        //}
+                    //});
                 }
 
                 @Override
                 public void onRequestFailed(final String message) {
-                    mFriendTask.cancel(true);
-                    mBillTask.cancel(true);
+                    //mFriendTask.cancel(true);
+                    //mBillTask.cancel(true);
                     //NOTE: parameter validation and filtering is handled by the backend, just show the
                     //returned error message to the user
                     Log.d(TAG, "Received error from Backend: " + message);
@@ -398,9 +400,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
                     });
+                    loadLock.release();
+                    //return false;
 
                 }
-            }); return true;}
+            });
+            Log.d(TAG, "curUser bot: " + curUser.toString());
+            while(loadLock.isLocked()){};
+            return (curUser.backendId != 0);//}
 
 
             /* Quest local database if info of the user has been stored
@@ -409,7 +416,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
             //lockLogin = true;
             // TODO: register the new account here.
-            return null;
+            //return null;
         }
 
         @Override
@@ -417,7 +424,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             //Log.d(null, "2");
             mAuthTask = null;
             showProgress(false);
-            if (!success){
+            if(success){
+                mFriendTask = new LoadUserFriendTask();
+                mFriendTask.execute((Void) null);
+                mBillTask = new LoadUserBillTask();
+                mBillTask.execute();
+            }else{
 
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -443,10 +455,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         //private final User curUser;
         @Override
         protected Boolean doInBackground(Void... params) {
-            while(!isCancelled()){
+            //while(!isCancelled()){
             final String TAG = "LOGIN_ACTIVITY_LF";
             final Context currContext = LoginActivity.this;
-            while(loadLock.isLocked()){if(isCancelled()) return null;};
+            //while(loadLock.isLocked()){if(isCancelled()) return null;};
 
             Backend.loadUserFriends(curUser, new Backend.BackendCallback() {
                 @Override
@@ -496,9 +508,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         }
                     });
                 }
-            }); return true;}
+            }); return true;//}
             //lockFriend = false;
-            return null;
+            //return null;
         }
 
         @Override
@@ -528,14 +540,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            while(!isCancelled()){
+            //while(!isCancelled()){
             final String TAG = "LOGIN_ACTIVITY_LB";
-            final Context currContext = LoginActivity.this;
+            //final Context currContext = LoginActivity.this;
 
-            while (loadLock.isLocked()) {
+            /*while (loadLock.isLocked()) {
                 if(isCancelled())
                 return null;
-            }
+            }*/
                 Log.d(TAG, "billTask in");
             Backend.loadUserBill(curUser, new Backend.BackendCallback() {
                 @Override
@@ -548,7 +560,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         //public void run() {
                             //while(taskLock.isLocked()){};
                             //final Bill resultBill = (Bill) result;
-                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
+                            SharedPreferences prefs =
+                                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
                             //SharedPreferences.Editor editor = prefs.edit();
                             for(Bill i : resultBills){
                                 if(i.settled){
@@ -570,11 +583,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             }
 
                             Log.d(TAG, "move on to main");
-                            Intent intent = new Intent(currContext, MainActivity.class);
-//                            intent.putExtra("userBackendID", SaveSharedPreference.getUserName(LoginActivity.this));
 
-                            startActivity(intent);
-                            finish();
                      //   }
                    // });
                 }
@@ -589,8 +598,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         }
                     });
                 }
-            }); return true;}
-            return null;
+            }); return true;//}
+            //return null;
         }
 
         @Override
@@ -599,12 +608,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             showProgress(true);
 
             if (success) {
-                //Log.d(null, "1");
-                //String email = mEmailView.getText().toString();
-                //String password = mPasswordView.getText().toString();
-                //mAuthTask = new UserLoginTask(email, password);
-                //mAuthTask.execute((Void) null);
-                //finish();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                            intent.putExtra("userBackendID", SaveSharedPreference.getUserName(LoginActivity.this));
+
+                startActivity(intent);
+                finish();
             } else {
                 //mPasswordView.setError(getString(R.string.error_incorrect_password));
                 //mPasswordView.requestFocus();
