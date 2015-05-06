@@ -31,7 +31,7 @@ import java.util.List;
 
 
 public class MainActivity extends ActionBarActivity {
-    public User user; // UI references.
+    public static User user; // UI references.
     private TextView IOwe;
     private TextView owedMe;
     private TextView balance;
