@@ -21,13 +21,17 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hjcyz1991.project407.Model.Bill;
 import com.example.hjcyz1991.project407.Model.User;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.gson.Gson;
 
 import java.io.IOError;
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -43,13 +47,45 @@ public class MainActivity extends ActionBarActivity {
     private Button profile;
     private Button settings;
     private final int LOGGED_OUT = 1;
+    private GCMClientManager pushClientManager;
+
+    public static final String EXTRA_MESSAGE = "message";
+    public static final String PROPERTY_REG_ID = "registration_id";
+    private static final String PROPERTY_APP_VERSION = "appVersion";
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
+    String PROJECT_NUMBER = "16617277799";
+    GoogleCloudMessaging gcm;
+    String regId;
+
 //    private Bill[] bills;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Get user
+
+        pushClientManager = new GCMClientManager(this, PROJECT_NUMBER);
+        pushClientManager.registerIfNeeded(new GCMClientManager.RegistrationCompletedHandler() {
+            @Override
+            public void onSuccess(String registrationId, boolean isNewRegistration) {
+                Toast.makeText(MainActivity.this, registrationId,
+                        Toast.LENGTH_SHORT).show();
+                regId = registrationId;
+                // SEND async device registration to your back-end server
+                // linking user with device registration id
+                // POST https://my-back-end.com/devices/register?user_id=123&device_id=abc
+            }
+            @Override
+            public void onFailure(String ex) {
+                super.onFailure(ex);
+                // If there is an error registering, don't just keep trying to register.
+                // Require the user to click a button again, or perform
+                // exponential back-off when retrying.
+            }
+        });
+
+                //Get user
         String userBackendID = SaveSharedPreference.getUserName(this);
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
@@ -69,6 +105,8 @@ public class MainActivity extends ActionBarActivity {
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
 
         listViewBills.setAdapter(arrayAdapter);
+
+
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -173,6 +211,27 @@ public class MainActivity extends ActionBarActivity {
         if(resultCode == LOGGED_OUT){
             finish();
         }
+    }
+    public void getRegId(){
+        new AsyncTask<Void, Void, String>() {
+            @Override
+            protected String doInBackground(Void... params) {
+                String msg = "";
+                try {
+                    if (gcm == null) {
+                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+                    }
+                    regId = gcm.register(PROJECT_NUMBER);
+                    msg = "Device registered, registration ID=" + regId;
+                    Log.i("GCM",  msg);
+
+                } catch (IOException ex) {
+                    msg = "Error :" + ex.getMessage();
+
+                }
+                return msg;
+            }
+        }.execute(null, null, null);
     }
 
 }

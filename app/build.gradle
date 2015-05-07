@@ -38,6 +38,5 @@ dependencies {
     compile 'com.hannesdorfmann:swipeback:1.0.0'
     compile files('/Users/hjcyz1991/AndroidStudioProjects/Project407/libs/PayPalAndroidSDK-2.9.3.jar')
     compile files('/Users/Winston/AndroidStudioProjects/cs407/Nada/libs/PayPalAndroidSDK-2.9.3.jar')
+    compile "com.google.android.gms:play-services:3.1.+"
 }
-
-

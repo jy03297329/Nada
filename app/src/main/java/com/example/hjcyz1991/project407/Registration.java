@@ -39,6 +39,8 @@ import org.apache.http.entity.StringEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -69,6 +71,9 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
     private Button register;
     private static final int PASSWORD_NOT_MATCH = 0;
     private static final int PASSWORD_NOT_VALID = 1;
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,7 +187,9 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     private boolean isEmailValid(String email) {
-        return email.contains("@") && email.contains(".");
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
     private int isPasswordValid(String password, String passwordConfirm) {

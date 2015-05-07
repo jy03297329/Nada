@@ -29,7 +29,11 @@ import java.util.Date;
  */
 public class Backend {
     private static final String TAG = "ConnectionManager";
-    private static final String SERVER_URL = "https://nadadana.herokuapp.com/";
+    static final String SERVER_URL = "https://nadadana.herokuapp.com/";
+    // Google Project Number
+    static final String GOOGLE_PROJ_ID = "16617277799";
+    // Message Key for GCM
+    static final String MSG_KEY = "Message";
 
     public interface BackendCallback {
         public void onRequestCompleted(Object result);
