@@ -44,8 +44,8 @@ import java.util.regex.Pattern;
 
 
 /**
-* A login screen that offers login via email/password.
-*/
+ * A login screen that offers login via email/password.
+ */
 public class Registration extends Activity implements LoaderCallbacks<Cursor> {
 
     /**
@@ -91,7 +91,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
         mPasswordView.setText(password);
 
         mPasswordViewConfirm = (EditText) findViewById(R.id.password_confirmation_register);
-        if(mEmailView.getText().length() > 0 && mPasswordView.getText().length() > 0)
+        if (mEmailView.getText().length() > 0 && mPasswordView.getText().length() > 0)
             mPasswordViewConfirm.requestFocus();
 
         lastName = (AutoCompleteTextView) findViewById(R.id.last_name_register);
@@ -156,7 +156,7 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
             focusView = mPasswordView;
             cancel = true;
         }
-        if(isPasswordValid(password, passwordConfirm) == PASSWORD_NOT_VALID){
+        if (isPasswordValid(password, passwordConfirm) == PASSWORD_NOT_VALID) {
             mPasswordViewConfirm.setError(getString(R.string.error_password_not_match));
             focusView = mPasswordViewConfirm;
             cancel = true;
@@ -194,9 +194,9 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
 
     private int isPasswordValid(String password, String passwordConfirm) {
 
-        if(password.length() < 6)
+        if (password.length() < 6)
             return PASSWORD_NOT_VALID;
-        if(!password.equals(passwordConfirm))
+        if (!password.equals(passwordConfirm))
             return PASSWORD_NOT_MATCH;
         return 2;
     }
@@ -321,26 +321,20 @@ public class Registration extends Activity implements LoaderCallbacks<Cursor> {
                 public void onRequestCompleted(Object result) {
                     final User user = (User) result;
                     Log.d(TAG, "Login success. User: " + user.toString());
+                    List<User> users = User.find(User.class, "backend_id = ?", new Integer(
+                            user.backendId).toString());
+                    SaveSharedPreference.setUserName(getApplicationContext(), Integer.toString(user.backendId));
+                    if (users.size() != 0) {
+                        Log.d(null, "------local db error: already having" +
+                                " new item-------");
+                        System.exit(-1);
+                    }
+                    user.authToken = mPassword;
+                    user.authTokenConfirm = mPassword;
+                    user.save();
+                    Intent intent = new Intent(currContext, MainActivity.class);
+                    startActivity(intent);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            List<User> users = User.find(User.class, "backend_id = ?", new Integer(
-                                    user.backendId).toString());
-                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
-                            SharedPreferences.Editor editor = prefs.edit();
-                            if(users.size() != 0){
-                                Log.d(null, "------local db error: already having" +
-                                        " new item-------");
-                                System.exit(-1);
-                            }
-                            user.save();
-                            editor.putString("loggedInId", Long.toString(user.getId()));
-                            editor.commit();
-                            Intent intent = new Intent(currContext, MainActivity.class);
-                            startActivity(intent);
-                        }
-                    });
                 }
 
                 @Override

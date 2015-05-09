@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/button_send_reminder"
-            android:layout_weight="0.50"
+            android:layout_weight="1"
             android:text="@string/button_send_reminder"/>
         <Button
             android:layout_width="wrap_content"

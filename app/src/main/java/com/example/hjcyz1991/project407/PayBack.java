@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
@@ -69,9 +70,7 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
 
         return super.onOptionsItemSelected(item);
     }
-
-    @Override
-    public void onDialogMessage(String message) {
+    public void showDialog(View v){
         String receiver = "XXX";
         FragmentManager fm = getFragmentManager();
         PaymentMethodDialog paymentDialog = new PaymentMethodDialog();
@@ -79,5 +78,11 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
         Bundle data = new Bundle();
         data.putString("receiver", receiver);
         paymentDialog.setArguments(data);
+        paymentDialog.setArguments(data);
+    }
+
+    @Override
+    public void onDialogMessage(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }

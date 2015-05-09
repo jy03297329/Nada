@@ -1,10 +1,12 @@
 package com.example.hjcyz1991.project407;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -13,7 +15,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.hjcyz1991.project407.Model.Backend;
 import com.example.hjcyz1991.project407.Model.User;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
@@ -28,6 +32,22 @@ public class ChangePassword extends ActionBarActivity {
     private EditText confirmNewPasswordView;
     private User user;
 
+    private class Bolean{
+        public boolean flag;
+        Bolean(){
+            flag = false;
+        }
+        public void lock(){
+            flag = false;
+        }
+        public void release(){
+            flag = true;
+        }
+        public boolean check(){
+            return flag;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,9 +60,11 @@ public class ChangePassword extends ActionBarActivity {
         currPasswordView = (EditText)findViewById(R.id.curr_password);
         newPasswordView = (EditText)findViewById(R.id.new_password);
         confirmNewPasswordView = (EditText)findViewById(R.id.new_password_confirm);
-        String userBackendID = SaveSharedPreference.getUserName(ChangePassword.this);
+        String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
+        Log.d("CHANGE_PASSWORD", "getting user ID from change_pwd activity: " + userBackendID);
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
+        Log.d(null, user.toString());
 
         changePassword.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +117,7 @@ public class ChangePassword extends ActionBarActivity {
                     focusView.requestFocus();
                 } else {
                     //update new password to backend;
-
+                    new ChangePasswordTask(user, currPassword).execute();
                     finish();
                 }
             }
@@ -140,4 +162,55 @@ public class ChangePassword extends ActionBarActivity {
         return password.length() >= 6;
     }
 
+    public class ChangePasswordTask extends AsyncTask<Void, Void, Boolean>{
+
+        private User curUser;
+        private String newPW;
+        final private Bolean f;
+        ChangePasswordTask(User u, String newPassword){
+            //Log.d("INTASKCLASS", "change pw for: " + curUser.toString());
+            curUser = u;
+            newPW = newPassword;
+            f = new Bolean();
+            f.lock();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void...params){
+            final String TAG = "CHANGE_PASSWORD_TASK";
+
+            Backend.changePassword(Integer.toString(curUser.backendId), curUser.name, curUser.authToken
+                    , newPW, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "Password changed successfully.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    f.release();
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+            return f.check();
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                finish();
+            }
+        }
+    }
 }
