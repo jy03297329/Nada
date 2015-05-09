@@ -12,10 +12,10 @@ public class Bill extends SugarRecord<Bill> {
 
     public Date created_at;
     public int debtor_id;
-    public User debtor;
+    //public User debtor;
     public int creditor_id;
-    public User creditor;
-    public BillEvent event;
+    //public User creditor;
+    public int event_id;
     public double amount;
     public boolean settled;
 
@@ -24,9 +24,10 @@ public class Bill extends SugarRecord<Bill> {
         created_at = new Date();
         debtor_id = 0;
         creditor_id = 0;
-        debtor = new User();
-        creditor = new User();
-        event = new BillEvent();
+        //debtor = new User();
+        //creditor = new User();
+        //event = new BillEvent();
+        event_id = 0;
         amount = 0.0;
         settled = false;
     }

@@ -49,24 +49,31 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
      * Keep track of the login task to ensure we can cancel it if requested.
      */
 
-    private class Lock{
+    private class Lock {
         private boolean locker;
-        Lock(){ locker = false;}
-        public boolean isLocked(){ return locker;}
-        public void release(){  locker = false;}
-        public void lock(){ locker = true;}
+
+        Lock() {
+            locker = false;
+        }
+
+        public boolean isLocked() {
+            return locker;
+        }
+
+        public void release() {
+            locker = false;
+        }
+
+        public void lock() {
+            locker = true;
+        }
     }
 
-    //private boolean toBreak = false;
     private UserLoginTask mAuthTask = null;
     private LoadUserFriendTask mFriendTask = null;
     private LoadUserBillTask mBillTask = null;
     private final User curUser = new User();
     private Lock loadLock = new Lock();
-    //private Lock Lock = new Lock();
-    //private Lock billLock = new Lock();
-    //private boolean lockFriend = true;
-    //private boolean lockBill = true;
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -81,7 +88,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         //If user has logged in is not signed out go to Main
-        if(SaveSharedPreference.getUserName(this).length() != 0){
+        if (SaveSharedPreference.getUserName(this).length() != 0) {
             Intent intent = new Intent(this, MainActivity.class);
 //            intent.putExtra("userBackendID", SaveSharedPreference.getUserName(this));
             startActivity(intent);
@@ -112,13 +119,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         login.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*if(loadLock.isLocked()){
-                    //mAuthTask.cancel(true);
-                    mFriendTask.cancel(true);
-                    mBillTask.cancel(true);
-                    if(mFriendTask == null)
-                        Log.d(null, "friendTask cancelled");
-                }*/
+
                 attemptLogin();
 
             }
@@ -345,53 +346,49 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 @Override
                 public void onRequestCompleted(Object result) {
                     final User user = (User) result;
-                    SaveSharedPreference.setUserName(LoginActivity.this, user.email);
+                    SaveSharedPreference.setUserName(getApplicationContext(), Integer.toString(user.backendId));
                     curUser.copy(user);
                     Log.d(TAG, "curUser: " + curUser.toString());
                     //Log.d(TAG, "Login success. User: " + user.toString());
                     Log.d(TAG, "Login success. curUser: " + curUser.toString());
-                    //runOnUiThread(new Runnable() {
-                      //  @Override
-                        //public void run() {
-                            //taskLock.release();
-                            //check db for user with existing backendId. If doesn't exit, then save
-                            List<User> users = User.find(User.class, "backend_id = ?", new Integer(
-                                    user.backendId).toString());
-                            //SaveSharedPreference prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
-                            //SharedPreferences.Editor editor = prefs.edit();
+                    //check db for user with existing backendId. If doesn't exit, then save
+                    List<User> users = User.find(User.class, "backend_id = ?", new Integer(
+                            user.backendId).toString());
+                    //SaveSharedPreference prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
+                    //SharedPreferences.Editor editor = prefs.edit();
 
-                            if (users.size() == 0) {
-                                Log.d(null, "new user: " + user.toString());
-                                user.save();
-                                Log.d(null, "new user added no problem: " + user.backendId);
-                                SaveSharedPreference.setUserName(currContext, Integer.toString(user.backendId));
-                                //editor.putString("loggedInId", Integer.toString(user.backendId));
-                                //editor.commit();
-                                //curUser.copy(user);
+                    if (users.size() == 0) {
+                        Log.d(null, "new user: " + user.toString());
+                        user.save();
+                        Log.d(null, "new user added no problem: " + user.backendId);
+                        SaveSharedPreference.setUserName(currContext, Integer.toString(user.backendId));
+                        //editor.putString("loggedInId", Integer.toString(user.backendId));
+                        //editor.commit();
+                        //curUser.copy(user);
 
-                            } else {
-                                final User tempUser = users.get(0);
-                                if(tempUser.backendId != user.backendId) {
-                                    Log.d(null, "backendId somehow changed!");
-                                    tempUser.backendId = user.backendId;
-                                }
-                                //Log.d(null, "currUser backendId: " + tempUser.backendId);
-                                tempUser.authToken = mPassword;
-                                //curUser.authToken = mPassword;
-                                tempUser.authTokenConfirm = mPassword;
-                                //curUser.authTokenConfirm = mPassword;
-                                //Log.d(null, "curr user: " + tempUser.toString());
-                                //Log.d(null, "****" + tempUser.authToken.toString());
+                    } else {
+                        final User tempUser = users.get(0);
+                        if (tempUser.backendId != user.backendId) {
+                            Log.d(null, "backendId somehow changed!");
+                            tempUser.backendId = user.backendId;
+                        }
+                        //Log.d(null, "currUser backendId: " + tempUser.backendId);
+                        tempUser.authToken = mPassword;
+                        //curUser.authToken = mPassword;
+                        tempUser.authTokenConfirm = mPassword;
+                        //curUser.authTokenConfirm = mPassword;
+                        //Log.d(null, "curr user: " + tempUser.toString());
+                        //Log.d(null, "****" + tempUser.authToken.toString());
 
-                                tempUser.save();
-                                curUser.copy(tempUser);
-                                SaveSharedPreference.setUserName(currContext, Integer.toString(user.backendId));
-                                //editor.putString("loggedInId", Long.toString(tempUser.getId()));
-                                //editor.commit();
+                        tempUser.save();
+                        curUser.copy(tempUser);
+                        SaveSharedPreference.setUserName(currContext, Integer.toString(user.backendId));
+                        //editor.putString("loggedInId", Long.toString(tempUser.getId()));
+                        //editor.commit();
 
-                            }
-                            loadLock.release();
-                        //}
+                    }
+                    loadLock.release();
+                    //}
                     //});
                 }
 
@@ -414,7 +411,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 }
             });
             Log.d(TAG, "curUser bot: " + curUser.toString());
-            while(loadLock.isLocked()){};
+            while (loadLock.isLocked()) {
+            }
+            ;
             return (curUser.backendId != 0);//}
 
 
@@ -432,12 +431,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             //Log.d(null, "2");
             mAuthTask = null;
             showProgress(false);
-            if(success){
-                mFriendTask = new LoadUserFriendTask();
-                mFriendTask.execute((Void) null);
+            if (success) {
+                //mFriendTask = new LoadUserFriendTask();
+                //mFriendTask.execute((Void) null);
                 mBillTask = new LoadUserBillTask();
                 mBillTask.execute();
-            }else{
+            } else {
 
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -454,12 +453,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     }
 
     //one more class to load the bill
-    public class LoadUserFriendTask extends AsyncTask<Void, Void, Boolean>{
+    public class LoadUserFriendTask extends AsyncTask<Void, Void, Boolean> {
 
         //private boolean running = true;
-        LoadUserFriendTask(){
-            Log.d(null, "created a new friendTask");
-        }
+        //LoadUserFriendTask(){
+        //  Log.d(null, "created a new friendTask");
+        //}
         //private final User curUser;
         @Override
         protected Boolean doInBackground(Void... params) {
@@ -471,38 +470,41 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             Backend.loadUserFriends(curUser, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
-                    //Log.d(null, "5");
                     final List<User> resultFriends = (List<User>) result;
-                    //Log.d(TAG, "FriendList get success. Original: " + resultUser.toString());
-                    //curUser.friends.clear();
-                    //Log.d(TAG, "FriendList get success. Original: " + resultUser.toString());
-                    //curUser.friends.addAll(resultUser.friends);
-                    //Log.d(TAG, "FriendList get success. Original: " + resultUser.toString());
-                    Log.d(TAG, "FriendList get success. User: " + curUser.toString());
-                    //runOnUiThread(new Runnable() {
-                       // @Override
-                        //public void run() {
-                            //while(taskLock.isLocked()){};
-                            List<User> users = User.find(User.class, "backend_id = ?", new Integer(
-                                    curUser.backendId).toString());
-                            Log.d(TAG, "user size: " + users.size());
-                            List<User> oldFriendshipList = users.get(0).getFriends();
-                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(currContext);
-                            //SharedPreferences.Editor editor = prefs.edit();
-                            for(User i : resultFriends){
-                                if(!oldFriendshipList.contains(i)){
-                                    friendship newFriend = new friendship(curUser, i);
-                                    newFriend.save();
-                                    Log.d(TAG, "new friend: " + i.toString());
-                                }
+                    Log.d(TAG, "FriendList get success. " + resultFriends.size() + " friends");
+                    List<User> users = User.find(User.class, "backend_id = ?", new Integer(
+                            curUser.backendId).toString());
+                    Log.d(TAG, "user size: " + users.size());
 
+                    List<Integer> oldFriendIdList = users.get(0).getFriendsId();
+                    Log.d(TAG, "user friend size: " + oldFriendIdList.size());
+                    if(!oldFriendIdList.isEmpty())
+                        Log.d(TAG, "old friend id : " + oldFriendIdList.get(0));
+
+                    for (User i : resultFriends) {
+                        if (!oldFriendIdList.contains(i.backendId)) {
+                            if(User.find(User.class, "backend_id = ?", new Integer(
+                                    i.backendId).toString()).isEmpty()) {
+                                User addUser = new User();
+                                addUser.copy(i);
+                                addUser.save();
+                                Log.d(TAG, "saving user: " + addUser.toString());
                             }
-                            //Log.d(null, "user friendList updated:\n" + user.toString());
-                            //Log.d(null, "user saved: \n" + users.get(0).toString());
-                            //Intent intent = new Intent(currContext, MainActivity.class);
-                            //startActivity(intent);
-                            //friendLock.release();
-                        //}
+                            Friendship newFriend = new Friendship(curUser, i);
+                            Log.d(TAG, "saving friend: " + newFriend.toString());
+                            Friendship reverseNewFriend = new Friendship(i, curUser);
+                            newFriend.save();
+                            reverseNewFriend.save();
+                            Log.d(TAG, "new friend: " + i.toString());
+                        }
+
+                    }
+                    //Log.d(null, "user friendList updated:\n" + user.toString());
+                    //Log.d(null, "user saved: \n" + users.get(0).toString());
+                    //Intent intent = new Intent(currContext, MainActivity.class);
+                    //startActivity(intent);
+                    //friendLock.release();
+                    //}
                     //});
                 }
 
@@ -516,7 +518,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         }
                     });
                 }
-            }); return true;//}
+            });
+            return true;//}
             //lockFriend = false;
             //return null;
         }
@@ -540,9 +543,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         }
     }
 
-    public class LoadUserBillTask extends AsyncTask<Void, Void, Boolean>{
+    public class LoadUserBillTask extends AsyncTask<Void, Void, Boolean> {
 
-        LoadUserBillTask(){
+        LoadUserBillTask() {
             Log.d(null, "created a new billTask");
         }
 
@@ -556,7 +559,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 if(isCancelled())
                 return null;
             }*/
-                Log.d(TAG, "billTask in");
+            Log.d(TAG, "billTask in");
             Backend.loadUserBill(curUser, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
@@ -564,36 +567,37 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     final List<Bill> resultBills = (List<Bill>) result;
                     Log.d(TAG, "BillList get success. User: " + curUser.toString());
                     //runOnUiThread(new Runnable() {
-                      //  @Override
-                        //public void run() {
-                            //while(taskLock.isLocked()){};
-                            //final Bill resultBill = (Bill) result;
-                            SharedPreferences prefs =
-                                    PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                            //SharedPreferences.Editor editor = prefs.edit();
-                            for(Bill i : resultBills){
-                                if(i.settled){
-                                    if(!curUser.getBillSettled().contains(i)){
-                                        i.save();
-                                        Log.d(TAG, "new settled bill: " + i.toString());
-                                    }
-                                }else if(i.debtor_id == curUser.backendId){
-                                    if(!curUser.getBillPay().contains(i)){
-                                        i.save();
-                                        Log.d(TAG, "new debted bill: " + i.toString());
-                                    }
-                                }else if(i.creditor_id == curUser.backendId){
-                                    if(!curUser.getBillRec().contains(i)){
-                                        i.save();
-                                        Log.d(TAG, "new credited bill: " + i.toString());
-                                    }
-                                }
+                    //  @Override
+                    //public void run() {
+                    //while(taskLock.isLocked()){};
+                    //final Bill resultBill = (Bill) result;
+                    //SharedPreferences prefs =
+                    //PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
+                    //SharedPreferences.Editor editor = prefs.edit();
+                    for (Bill i : resultBills) {
+                        if (i.settled) {
+                            if (!curUser.getBillSettled().contains(i)) {
+                                i.save();
+                                Log.d(TAG, "new settled bill: " + i.toString());
                             }
+                        } else if (i.debtor_id == curUser.backendId) {
+                            if (!curUser.getBillPay().contains(i)) {
 
-                            Log.d(TAG, "move on to main");
+                                i.save();
+                                Log.d(TAG, "new debted bill: " + i.toString());
+                            }
+                        } else if (i.creditor_id == curUser.backendId) {
+                            if (!curUser.getBillRec().contains(i)) {
+                                i.save();
+                                Log.d(TAG, "new credited bill: " + i.toString());
+                            }
+                        }
+                    }
 
-                     //   }
-                   // });
+                    Log.d(TAG, "move on to main");
+
+                    //   }
+                    // });
                 }
 
                 @Override
@@ -606,7 +610,8 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         }
                     });
                 }
-            }); return true;//}
+            });
+            return true;//}
             //return null;
         }
 

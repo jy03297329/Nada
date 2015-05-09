@@ -37,6 +37,7 @@ public class Backend {
 
     public interface BackendCallback {
         public void onRequestCompleted(Object result);
+
         public void onRequestFailed(String message);
     }
 
@@ -67,16 +68,6 @@ public class Backend {
                 result.remove("id");
                 result.addProperty("authToken", password);
                 result.addProperty("authTokenConfirm", password);
-                //String temp = result.get("created_at").toString();
-                //String temp2 = "\""
-                //Log.d(null, result.get("created_at").toString());
-                //String temp = "\"2013-02-10T13:45:30+0100\"";
-                //result.remove("created_at");
-                //result.addProperty("created_at", temp);
-                //Log.d(TAG, "Login returned: " + result);
-                //Gson gson = new Gson();
-                //Date test = gson.fromJson(temp, Date.class);
-                //Log.d(null, "date:" + test);
                 Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
                 User user = gson.fromJson(result, User.class);
                 //Log.d(null, "---------" + user.toString());
@@ -92,7 +83,7 @@ public class Backend {
         });
     }
 
-    public static void loadUserFriends(final User user, final BackendCallback callback){
+    public static void loadUserFriends(final User user, final BackendCallback callback) {
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
         StringEntity jsonParams = null;
         //Log.d(null, "*******" + user.toString());
@@ -104,7 +95,7 @@ public class Backend {
             jsonParams = new StringEntity(json.toString());
             //Log.d(null, "checking friend posts");
             //Log.d(null, json.toString());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -123,6 +114,7 @@ public class Backend {
                             JsonObject friend = element.getAsJsonObject();
                             friend.addProperty("backendId", friend.get("id").toString());
                             friend.remove("id");
+                            //friend.addProperty("");
                             Gson gson = new Gson();
                             newFriends.add(gson.fromJson(friend, User.class));
                             //user.friends.add(newFriend);
@@ -140,7 +132,7 @@ public class Backend {
                 });
     }
 
-    public static void loadUserBill(final User user, final BackendCallback callback){
+    public static void loadUserBill(final User user, final BackendCallback callback) {
         //final int userId = user.backendId;
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
         StringEntity jsonParams = null;
@@ -149,7 +141,7 @@ public class Backend {
             json.put("cur_user_id", user.backendId);
             json.put("password", user.authToken);
             jsonParams = new StringEntity(json.toString());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         List<Header> headers = new ArrayList<Header>();
@@ -177,7 +169,7 @@ public class Backend {
             }
 
             @Override
-            public void onFailure(){
+            public void onFailure() {
                 Log.d(null, "trying to get bill list");
                 Log.d(null, "failed");
                 callback.onRequestFailed(handleFailure(getContent()));
@@ -187,7 +179,7 @@ public class Backend {
     }
 
     public static void register(String name, String email, String password, String conPassword,
-                                final BackendCallback callback){
+                                final BackendCallback callback) {
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
         StringEntity jsonParams = null;
 
@@ -199,7 +191,6 @@ public class Backend {
             userData.put("password", password);
             userData.put("password_confirmation", conPassword);
             userJson.accumulate("user", userData);
-            //userJson.wrap(userData);
 
             //Log.d(null, "----------" + userJson.toString());
             jsonParams = new StringEntity(userJson.toString());
@@ -236,20 +227,14 @@ public class Backend {
 
     }
 
-    public static void searchFriend(String email,
-                                    final BackendCallback callback){
+    public static void searchUser(String email,
+                                    final BackendCallback callback) {
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
         StringEntity jsonParams = null;
         try {
-            JSONObject userJson = new JSONObject();
-            JSONObject userData = new JSONObject();
-            userData.put("email", email);
-            //userData.put("password", password);
-            //userJson.accumulate("friend_id", friendId);
-            //userJson.wrap(userData);
-
-            //Log.d(null, "----------" + userJson.toString());
-            jsonParams = new StringEntity(userJson.toString());
+            JSONObject json = new JSONObject();
+            json.put("email", email);
+            jsonParams = new StringEntity(json.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -263,7 +248,7 @@ public class Backend {
                 JsonObject result = getContent().getAsJsonObject();
                 result.addProperty("backendId", result.get("id").toString());
                 result.remove("id");
-                Log.d(TAG, "Register returned: " + result);
+                Log.d(null, "Search user returned: " + result);
                 Gson gson = new Gson();
                 User user = gson.fromJson(result, User.class);
                 callback.onRequestCompleted(user);
@@ -272,7 +257,7 @@ public class Backend {
 
             @Override
             public void onFailure() {
-                Log.d(null, "trying to post to users");
+                Log.d(null, "trying to search users");
                 Log.d(null, "failed");
                 callback.onRequestFailed(handleFailure(getContent()));
             }
@@ -280,13 +265,98 @@ public class Backend {
 
     }
 
-    public static void addFriend(User user, String friendEmail, final BackendCallback callback){
+    public static void addFriend(int user_id, String password,
+                                 String friendEmail, final BackendCallback callback) {
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", user_id);
+            json.put("password", password);
+            json.put("friend_email", friendEmail);
+            Log.d("ADD_FRIEND", json.toString());
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.post("friendships", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                JsonArray friendship = (JsonArray) getContent().
+                        getAsJsonObject().get("friendships");
+                //List<Friendship> resultFriendship = new ArrayList<Friendship>();
+                if (friendship.size() != 2)
+                    Log.d("ERROR: ", "***friendshipList from backend have "
+                            + friendship.size() + " friendships!");
+                /*for (JsonElement e : friendship) {
+                    JsonObject result = e.getAsJsonObject();
+                    result.addProperty("backendId", result.get("id").toString());
+                    result.remove("id");
+                    resultFriendship.add(new Gson().fromJson(result, Friendship.class));
+                }*/
+                //JsonObject friendId = (JsonObject)friendship.get(0).getAsJsonObject().get("friend_id");
 
+                callback.onRequestCompleted(null);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(null, "trying to add friend list");
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+    }
+
+    //actually add event
+    public static void addBillEvent(User user, int totalAmt, String billName, String note,
+                               int creditor_id, List<Bill> bills, final BackendCallback callback) {
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", user.backendId);
+            json.put("password", user.authToken);
+            json.put("name", billName);
+            json.put("total", totalAmt);
+            json.put("note", note);
+            json.put("creditor_id", creditor_id);
+            for (Bill i : bills) {
+                JSONObject billData = new JSONObject();
+                billData.put("debtor_id", i.debtor_id);
+                billData.put("amount", i.amount);
+                json.accumulate("bills", billData);
+            }
+
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.post("events", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                callback.onRequestCompleted(getContent().getAsJsonObject());
+            }
+            @Override
+            public void onFailure() {
+                Log.d(null, "trying to add bill event");
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
     }
 
     /* Convenience methods */
+
     /**
      * Convenience method for parsing server error responses, since most of the handling is similar.
+     *
      * @param response the raw response from a server failure.
      * @return a string with an appropriate error message.
      */
@@ -302,16 +372,12 @@ public class Backend {
         //with one key called "message". This is a convention for this server.
         try {
             errorMessage = result.get("message").toString();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Log.d(TAG, "Unable to parse server error message");
         }
 
         return errorMessage;
     }
-
-
-
 
 
 }

@@ -1,11 +1,15 @@
 package com.example.hjcyz1991.project407.Model;
 
+import android.util.Log;
+
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Date;
 import java.util.List;
 
+import com.orm.StringUtil;
 import com.orm.SugarRecord;
 
 /**
@@ -23,8 +27,6 @@ public class User extends SugarRecord<User>{
     public String authToken;
     public String authTokenConfirm;
     public Date tokenExpiration;
-    //public HashSet<BillEvent> eventPay;
-    //public HashSet<BillEvent> eventRec;
 
     public double moneyPay;
     public double moneyRec;
@@ -45,27 +47,86 @@ public class User extends SugarRecord<User>{
         moneyRec = 0.0;
     }
 
-    public List<User> getFriends(){
+    public List<Integer> getFriendsId(){
+        List<User> friends = this.getFriends();
+        List<Integer> friendsId = new ArrayList<Integer>();
 
-        return friendship.findWithQuery(User.class, "Select friend from friendship where user = ?",
-                Long.toString(this.getId()));
+        for(User i : friends){
+            friendsId.add(i.backendId);
+            Log.d("IN USER CLASS", "friend: " + i.toString());
+        }
+        return friendsId;
+    }
+
+    public List<User> getFriends(){
+        Log.d("GETTING FRIEND: ", "getting friends");
+        /*String query = new StringBuilder()
+                .append("Select ")
+                .append(StringUtil.toSQLName("friend"))
+                .append(" from ").append(StringUtil.toSQLName("Friendship"))
+                .append(" where ").append(StringUtil.toSQLName("userId"))
+                .append(" = ?").toString();
+        Log.d("GETTING FRIEND: ", query);
+        return Friendship.findWithQuery(User.class, query,
+                Integer.toString(this.backendId));*/
         //result.addAll(friendship.find(User.class, "user2 = ?", this.getId().toString()));
+        return Friendship.find(User.class, "backend_id", Integer.toString(this.backendId));
         //return result;
     }
 
     public List<Bill> getBillPay(){
-        return Bill.find(Bill.class, "debtor_id = ? and settled = ?",
+        //Log.d(null, StringUtil.toSQLName("debtor_id"));
+        String query = new StringBuilder()
+                .append(StringUtil.toSQLName("debtor_id"))
+                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
+                .append(" = ?").toString();
+        return Bill.find(Bill.class, query,
                 Integer.toString(this.backendId), "false");
     }
     public List<Bill> getBillRec(){
-        return Bill.find(Bill.class, "creditor_id = ? and settled = ?",
+        String query = new StringBuilder()
+                .append(StringUtil.toSQLName("creditor_id"))
+                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
+                .append(" = ?").toString();
+        return Bill.find(Bill.class, query,
                 Integer.toString(this.backendId), "false");
     }
     public List<Bill> getBillSettled(){
-        List<Bill> result = Bill.find(Bill.class, "debtor_id = ? and settled = ?",
+        String query1 = new StringBuilder()
+                .append(StringUtil.toSQLName("debtor_id"))
+                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
+                .append(" = ?").toString();
+        String query2 = new StringBuilder()
+                .append(StringUtil.toSQLName("creditor_id"))
+                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
+                .append(" = ?").toString();
+        List<Bill> result = Bill.find(Bill.class, query1,
                 Integer.toString(this.backendId), "true");
-        result.addAll(Bill.find(Bill.class, "creditor_id = ? and settled = ?",
+        result.addAll(Bill.find(Bill.class, query2,
                 Integer.toString(this.backendId), "true"));
+        return result;
+    }
+
+    public List<Bill> getBillUnsettled(){
+        String query1 = new StringBuilder()
+                .append(StringUtil.toSQLName("debtor_id"))
+                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
+                .append(" = ?").toString();
+        String query2 = new StringBuilder()
+                .append(StringUtil.toSQLName("creditor_id"))
+                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
+                .append(" = ?").toString();
+        List<Bill> result = Bill.find(Bill.class, query1,
+                Integer.toString(this.backendId), "false");
+        result.addAll(Bill.find(Bill.class, query2,
+                Integer.toString(this.backendId), "false"));
+        return result;
+    }
+
+    public List<Bill> getAllBill(){
+        List<Bill> result = this.getBillSettled();
+        result.addAll(this.getBillUnsettled());
+
         return result;
     }
 
@@ -76,19 +137,12 @@ public class User extends SugarRecord<User>{
         authToken = user.authToken;
         authTokenConfirm = user.authTokenConfirm;
         created_at = user.created_at;
-        /*if(user.friends != null)
-            friends.addAll(user.friends);
-        if(user.billPay != null)
-            billPay.addAll(user.billPay);
-        if(user.billRec != null)
-            billRec.addAll(user.billRec);
-        billSettled.addAll(user.billSettled);*/
-        //eventPay.addAll(user.eventPay);
-        //eventRec.addAll(user.eventRec);
-//        if(user.moneyRec != null)
         moneyRec = user.moneyRec;
-
         moneyPay = user.moneyPay;
+    }
+
+    public List<User> getAll(){
+        return User.listAll(User.class);
     }
 
 

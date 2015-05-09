@@ -139,4 +139,6 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     public void onDialogMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
+
+    //public class
 }

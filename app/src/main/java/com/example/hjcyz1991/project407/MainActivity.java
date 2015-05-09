@@ -86,9 +86,11 @@ public class MainActivity extends ActionBarActivity {
         });
 
                 //Get user
-        String userBackendID = SaveSharedPreference.getUserName(this);
+        String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
+        Log.d("MAIN_ACTIVITY", "getting user ID from login activity: " + userBackendID);
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
+        //SaveSharedPreference.setUserName(MainActivity.this, Integer.toString(user.backendId));
 
         listViewBills = (ListView) findViewById(R.id.list_view_bills);
 
@@ -191,7 +193,7 @@ public class MainActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_add_friends:
-                Intent intentAddFriends = new Intent(this, AddFriends.class);
+                Intent intentAddFriends = new Intent(MainActivity.this, AddFriends.class);
                 startActivity(intentAddFriends);
                 return true;
 //            case R.id.action_add_groups:
