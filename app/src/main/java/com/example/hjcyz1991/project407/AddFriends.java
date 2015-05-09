@@ -18,8 +18,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.example.hjcyz1991.project407.Model.Backend;
-import com.example.hjcyz1991.project407.Model.Friendship;
 import com.example.hjcyz1991.project407.Model.User;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,12 +60,12 @@ public class AddFriends extends ActionBarActivity {
         String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
-        List<User> curUserFriends = user.getFriends();
+        //List<User> curUserFriends = user.getFriends();
         final List<String> friendEmails = new ArrayList<String>();
-        for(User i : curUserFriends){
-            friendEmails.add(i.email);
-        }
-        Log.d("friendsEmail", friendEmails.size() + " friends");
+        //for(User i : curUserFriends){
+          //  friendEmails.add(i.email);
+        //}
+        //Log.d("friendsEmail", friendEmails.size() + " friends");
         searchBox = (EditText) findViewById(R.id.search);
         searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

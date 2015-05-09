@@ -221,7 +221,11 @@ public class Backend {
             public void onFailure() {
                 Log.d(null, "trying to post to users");
                 Log.d(null, "failed");
-                callback.onRequestFailed(handleFailure(getContent()));
+                JsonArray errMsg = (JsonArray) getContent().getAsJsonObject().get("email");
+                Gson gson = new Gson();
+                String err = gson.fromJson(errMsg.get(0), String.class);
+
+                callback.onRequestFailed(err);
             }
         });
 
@@ -291,14 +295,6 @@ public class Backend {
                 if (friendship.size() != 2)
                     Log.d("ERROR: ", "***friendshipList from backend have "
                             + friendship.size() + " friendships!");
-                /*for (JsonElement e : friendship) {
-                    JsonObject result = e.getAsJsonObject();
-                    result.addProperty("backendId", result.get("id").toString());
-                    result.remove("id");
-                    resultFriendship.add(new Gson().fromJson(result, Friendship.class));
-                }*/
-                //JsonObject friendId = (JsonObject)friendship.get(0).getAsJsonObject().get("friend_id");
-
                 callback.onRequestCompleted(null);
             }
 
@@ -350,6 +346,43 @@ public class Backend {
                 callback.onRequestFailed(handleFailure(getContent()));
             }
         });
+    }
+
+    public static void changePassword(String backendId, String name, String oldAuth, String newAuth,
+                                      final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("name", name);
+            json.put("old_password", oldAuth);
+            json.put("password", newAuth);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        String url = "users/" + backendId;
+        Log.d("BEND_CHANGE_PASSWORD", url);
+        client.put(url, jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                JsonObject updatedUser = (JsonObject) getContent().
+                        getAsJsonObject().get("user");
+                callback.onRequestCompleted(updatedUser);
+
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(null, "trying to change password");
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+
     }
 
     /* Convenience methods */

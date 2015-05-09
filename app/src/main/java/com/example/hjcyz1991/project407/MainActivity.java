@@ -89,6 +89,7 @@ public class MainActivity extends ActionBarActivity {
         Log.d("MAIN_ACTIVITY", "getting user ID from login activity: " + userBackendID);
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
+        Log.d("MAIN_ACTIVITY", user.getAllBill().toString());
         //SaveSharedPreference.setUserName(MainActivity.this, Integer.toString(user.backendId));
 
         listViewBills = (ListView) findViewById(R.id.list_view_bills);

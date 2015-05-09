@@ -3,6 +3,7 @@ package com.example.hjcyz1991.project407.Model;
 import com.orm.SugarRecord;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Winston on 4/15/15.
@@ -33,7 +34,7 @@ public class Bill extends SugarRecord<Bill> {
     }
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("\n\t Bill: ");
+        sb.append("\n\t ");
         sb.append("\n\t backendId: " + backendId);
         sb.append("\n\t creditor: " + creditor_id);
         sb.append("\n\t debtor: " + debtor_id);

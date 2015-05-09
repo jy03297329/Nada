@@ -454,12 +454,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     //one more class to load the bill
     public class LoadUserFriendTask extends AsyncTask<Void, Void, Boolean> {
-
-        //private boolean running = true;
-        //LoadUserFriendTask(){
-        //  Log.d(null, "created a new friendTask");
-        //}
-        //private final User curUser;
         @Override
         protected Boolean doInBackground(Void... params) {
             //while(!isCancelled()){
@@ -490,22 +484,15 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                 addUser.save();
                                 Log.d(TAG, "saving user: " + addUser.toString());
                             }
-                            Friendship newFriend = new Friendship(curUser, i);
-                            Log.d(TAG, "saving friend: " + newFriend.toString());
-                            Friendship reverseNewFriend = new Friendship(i, curUser);
-                            newFriend.save();
-                            reverseNewFriend.save();
+                            //Friendship newFriend = new Friendship(curUser, i);
+                            //Log.d(TAG, "saving friend: " + newFriend.toString());
+                            //Friendship reverseNewFriend = new Friendship(i, curUser);
+                            //newFriend.save();
+                            //reverseNewFriend.save();
                             Log.d(TAG, "new friend: " + i.toString());
                         }
 
                     }
-                    //Log.d(null, "user friendList updated:\n" + user.toString());
-                    //Log.d(null, "user saved: \n" + users.get(0).toString());
-                    //Intent intent = new Intent(currContext, MainActivity.class);
-                    //startActivity(intent);
-                    //friendLock.release();
-                    //}
-                    //});
                 }
 
                 @Override
