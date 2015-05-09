@@ -1,4 +1,4 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,24 +7,30 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.example.hjcyz1991.project407.SendReminder">
-    <ScrollView
+    <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bill_list_view_reminder"
+        android:layout_gravity="center_horizontal"
+        android:choiceMode="multipleChoice"
+        tools:listitem="@android:layout/simple_list_item_checked"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/pay_back_info"
-                android:layout_weight="2"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/button_send_reminder"
-                android:text="@string/button_send_reminder"/>
-        </LinearLayout>
-    </ScrollView>
-
-</LinearLayout>
+            android:id="@+id/button_send_reminder"
+            android:layout_weight="1"
+            android:text="@string/button_send_reminder"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/button_cancel"
+            android:layout_weight="1"
+            android:text="@string/button_cancel"
+            />
+    </LinearLayout>
+</RelativeLayout>

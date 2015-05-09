@@ -18,12 +18,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/bill_name"
-            android:maxLines="1"
             android:text="@string/bill_name"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/bill_name_edit"
+            android:maxLines="1"
+            android:singleLine="true"
             />
         </LinearLayout>
     <RelativeLayout
@@ -72,6 +73,7 @@
             android:maxLines="1"
             android:inputType="numberDecimal"
             android:id="@+id/total_amount_edit"
+            android:singleLine="true"
             />
     </LinearLayout>
     <LinearLayout
@@ -89,7 +91,7 @@
             android:layout_height="159dp"
             android:inputType="textMultiLine"
             android:ems="10"
-            android:id="@+id/editText"
+            android:id="@+id/notes_edit"
             android:layout_gravity="center_horizontal" />
         </LinearLayout>
 

@@ -32,9 +32,13 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     private Button addContact;
     private Button iAsk;
     private Button iPay;
+    private EditText billName;
+    private EditText totalAmt;
+    private EditText notes;
     private TextView peopleEdit;
     private final int REQUEST_CODE = 0;
     private final int CONTACTS_SELECTED = 1;
+    private ArrayList<Integer> selectedItemsID;
 
 
     // Can be NO_NETWORK for OFFLINE, SANDBOX for TESTING and LIVE for PRODUCTION
@@ -68,6 +72,9 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
 //        startService(intent);
         peopleEdit = (TextView) findViewById(R.id.people_edit);
         addContact = (Button) findViewById(R.id.button_add_contact);
+        billName = (EditText)findViewById(R.id.bill_name_edit);
+        totalAmt = (EditText)findViewById(R.id.total_amount_edit);
+        notes = (EditText)findViewById(R.id.notes_edit);
         addContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -75,6 +82,20 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
                 startActivityForResult(intent, REQUEST_CODE);
             }
         });
+        iAsk = (Button)findViewById(R.id.i_ask);
+        iPay = (Button)findViewById(R.id.i_pay);
+
+        iAsk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //creat new bill
+                String billNameStr =  billName.getText().toString();
+                String totalAmtStr = totalAmt.getText().toString();
+                String notesStr = notes.getText().toString();
+                System.out.print(billNameStr +" " +totalAmtStr + " " + notesStr);
+        }
+        });
+
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -84,7 +105,7 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
                 Bundle bundleID = data.getExtras().getBundle("contactsSelectedID");
                 String[] resultArr = bundleNames.getStringArray("selectedItems");
                 //Selected users' ids for backend communications
-                ArrayList<Integer> selectedItemsID = bundleID.getIntegerArrayList("selectedItemsID");
+                selectedItemsID = bundleID.getIntegerArrayList("selectedItemsID");
                 String names = resultArr[0];
                 for(int i = 1; i < resultArr.length; i++){
                     names = names + ", " + resultArr[i];
@@ -139,6 +160,4 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     public void onDialogMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
-
-    //public class
 }

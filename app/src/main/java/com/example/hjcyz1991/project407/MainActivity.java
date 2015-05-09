@@ -90,7 +90,6 @@ public class MainActivity extends ActionBarActivity {
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
         Log.d("MAIN_ACTIVITY", user.getAllBill().toString());
-        //SaveSharedPreference.setUserName(MainActivity.this, Integer.toString(user.backendId));
 
         listViewBills = (ListView) findViewById(R.id.list_view_bills);
 
@@ -103,8 +102,19 @@ public class MainActivity extends ActionBarActivity {
         balance = (TextView) findViewById(R.id.balance);
         balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));
 
-        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
+        Bill bill = new Bill();
+        bill.amount = 99.99;
+        bill.backendId = 123;
+        bill.creditor_id = 789;
+
+        List<Bill> mainContent = user.getBillPay();
+        String[] mainContentStr = new String[mainContent.size()];
+        for(int i = 0; i < mainContent.size(); i++){
+            mainContentStr[i] = mainContent.get(i).toString();
+        }
+//        mainContentStr[0] = bill.toString();
+//        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mainContentStr);
 
         listViewBills.setAdapter(arrayAdapter);
 
@@ -210,31 +220,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == LOGGED_OUT){
+        if (resultCode == LOGGED_OUT) {
             finish();
         }
     }
-//    public void getRegId(){
-//        new AsyncTask<Void, Void, String>() {
-//            @Override
-//            protected String doInBackground(Void... params) {
-//                String msg = "";
-//                try {
-//                    if (gcm == null) {
-//                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-//                    }
-//                    regId = gcm.register(PROJECT_NUMBER);
-//                    msg = "Device registered, registration ID=" + regId;
-//                    Log.i("GCM",  msg);
-//
-//                } catch (IOException ex) {
-//                    msg = "Error :" + ex.getMessage();
-//
-//                }
-//                return msg;
-//            }
-//        }.execute(null, null, null);
-//    }
+
 
 }
 
