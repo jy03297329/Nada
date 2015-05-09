@@ -123,11 +123,15 @@ public class User extends SugarRecord<User>{
         return result;
     }
 
-    public List<Bill> getAllBill(){
+    public List<Integer> getAllBillId(){
         List<Bill> result = this.getBillSettled();
         result.addAll(this.getBillUnsettled());
+        List<Integer> resultId = new ArrayList<Integer>();
+        for(Bill i : result){
+            resultId.add(i.backendId);
+        }
 
-        return result;
+        return resultId;
     }
 
     public void copy(User user){

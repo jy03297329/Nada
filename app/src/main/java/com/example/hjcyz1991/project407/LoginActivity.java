@@ -553,32 +553,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     //Log.d(null, "5");
                     final List<Bill> resultBills = (List<Bill>) result;
                     Log.d(TAG, "BillList get success. User: " + curUser.toString());
-                    //runOnUiThread(new Runnable() {
-                    //  @Override
-                    //public void run() {
-                    //while(taskLock.isLocked()){};
-                    //final Bill resultBill = (Bill) result;
-                    //SharedPreferences prefs =
-                    //PreferenceManager.getDefaultSharedPreferences(LoginActivity.this);
-                    //SharedPreferences.Editor editor = prefs.edit();
                     for (Bill i : resultBills) {
-                        if (i.settled) {
-                            if (!curUser.getBillSettled().contains(i)) {
+                            if (!curUser.getAllBillId().contains(i.backendId)) {
                                 i.save();
                                 Log.d(TAG, "new settled bill: " + i.toString());
                             }
-                        } else if (i.debtor_id == curUser.backendId) {
-                            if (!curUser.getBillPay().contains(i)) {
-
-                                i.save();
-                                Log.d(TAG, "new debted bill: " + i.toString());
-                            }
-                        } else if (i.creditor_id == curUser.backendId) {
-                            if (!curUser.getBillRec().contains(i)) {
-                                i.save();
-                                Log.d(TAG, "new credited bill: " + i.toString());
-                            }
-                        }
                     }
 
                     Log.d(TAG, "move on to main");

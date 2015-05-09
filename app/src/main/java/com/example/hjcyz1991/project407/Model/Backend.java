@@ -134,6 +134,7 @@ public class Backend {
 
     public static void loadUserBill(final User user, final BackendCallback callback) {
         //final int userId = user.backendId;
+        final List<Bill> newBills = new ArrayList<Bill>();
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
         StringEntity jsonParams = null;
         try {
@@ -155,14 +156,37 @@ public class Backend {
             public void onSuccess() {
                 //JsonObject result = getContent().getAsJsonObject();
                 JsonArray billList = (JsonArray) getContent().getAsJsonObject().get("unpaid_bills");
-                List<Bill> newBills = new ArrayList<Bill>();
+
                 for (JsonElement element : billList) {
                     JsonObject bill = element.getAsJsonObject();
                     bill.addProperty("backendId", bill.get("id").toString());
                     bill.remove("id");
                     Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
                     newBills.add(gson.fromJson(bill, Bill.class));
+                    //Log.d(null, newBill.toString());
+                }
+                //callback.onRequestCompleted(newBills);
+            }
 
+            @Override
+            public void onFailure() {
+                Log.d(null, "trying to get pay_bill list");
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+        client.post("bills/unrec_bills", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                //JsonObject result = getContent().getAsJsonObject();
+                JsonArray billList = (JsonArray) getContent().getAsJsonObject().get("unpaid_bills");
+                //List<Bill> newBills = new ArrayList<Bill>();
+                for (JsonElement element : billList) {
+                    JsonObject bill = element.getAsJsonObject();
+                    bill.addProperty("backendId", bill.get("id").toString());
+                    bill.remove("id");
+                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+                    newBills.add(gson.fromJson(bill, Bill.class));
                     //Log.d(null, newBill.toString());
                 }
                 callback.onRequestCompleted(newBills);
@@ -170,13 +194,16 @@ public class Backend {
 
             @Override
             public void onFailure() {
-                Log.d(null, "trying to get bill list");
+                Log.d(null, "trying to get rec_bill list");
                 Log.d(null, "failed");
                 callback.onRequestFailed(handleFailure(getContent()));
             }
         });
 
+
     }
+
+
 
     public static void register(String name, String email, String password, String conPassword,
                                 final BackendCallback callback) {
