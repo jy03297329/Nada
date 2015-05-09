@@ -9,15 +9,49 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.hjcyz1991.project407.Model.User;
+import com.hannesdorfmann.swipeback.Position;
+import com.hannesdorfmann.swipeback.SwipeBack;
 
 
 public class ViewBills extends ActionBarActivity {
-
+    private Button iOwe;
+    private Button oweMe;
+    private ListView billList;
+    private User user;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_bills);
+        SwipeBack.attach(this, Position.LEFT)
+                .setContentView(R.layout.activity_view_bills)
+                .setSwipeBackView(R.layout.swipeback_default);
+        iOwe = (Button)findViewById(R.id.i_owe);
+        oweMe = (Button)findViewById(R.id.owe_me);
+//        iOwe.setPressed(true);
+        billList = (ListView)findViewById(R.id.bill_list_view);
+
+        iOwe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iOwe.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                oweMe.setBackgroundResource(android.R.drawable.btn_default);
+
+
+            }
+        });
+
+        oweMe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                oweMe.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
+                iOwe.setBackgroundResource(android.R.drawable.btn_default);
+            }
+        });
     }
 
 

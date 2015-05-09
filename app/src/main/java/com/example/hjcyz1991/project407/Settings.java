@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.hannesdorfmann.swipeback.Position;
+import com.hannesdorfmann.swipeback.SwipeBack;
 import com.paypal.android.sdk.payments.PayPalFuturePaymentActivity;
 import com.paypal.android.sdk.payments.PayPalService;
 
@@ -30,6 +32,9 @@ public class Settings extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        SwipeBack.attach(this, Position.LEFT)
+                .setContentView(R.layout.activity_settings)
+                .setSwipeBackView(R.layout.swipeback_default);
         logout = (Button)findViewById(R.id.logout);
         logout.setOnClickListener(new View.OnClickListener() {
             @Override

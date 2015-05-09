@@ -32,7 +32,7 @@ public class GCMClientManager {
     public static abstract class RegistrationCompletedHandler {
         public abstract void onSuccess(String registrationId, boolean isNewRegistration);
         public void onFailure(String ex) {
-            // If there is an error, don't just keep trying to register.
+            // If there is an error, don't just keep trying to registera.
             // Require the user to click a button again, or perform
             // exponential back-off.
             Log.e(TAG, ex);

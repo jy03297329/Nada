@@ -55,7 +55,6 @@ public class MainActivity extends ActionBarActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     String PROJECT_NUMBER = "16617277799";
-    GoogleCloudMessaging gcm;
     String regId;
 
 //    private Bill[] bills;
@@ -212,27 +211,27 @@ public class MainActivity extends ActionBarActivity {
             finish();
         }
     }
-    public void getRegId(){
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... params) {
-                String msg = "";
-                try {
-                    if (gcm == null) {
-                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-                    }
-                    regId = gcm.register(PROJECT_NUMBER);
-                    msg = "Device registered, registration ID=" + regId;
-                    Log.i("GCM",  msg);
-
-                } catch (IOException ex) {
-                    msg = "Error :" + ex.getMessage();
-
-                }
-                return msg;
-            }
-        }.execute(null, null, null);
-    }
+//    public void getRegId(){
+//        new AsyncTask<Void, Void, String>() {
+//            @Override
+//            protected String doInBackground(Void... params) {
+//                String msg = "";
+//                try {
+//                    if (gcm == null) {
+//                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
+//                    }
+//                    regId = gcm.register(PROJECT_NUMBER);
+//                    msg = "Device registered, registration ID=" + regId;
+//                    Log.i("GCM",  msg);
+//
+//                } catch (IOException ex) {
+//                    msg = "Error :" + ex.getMessage();
+//
+//                }
+//                return msg;
+//            }
+//        }.execute(null, null, null);
+//    }
 
 }
 

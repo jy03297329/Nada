@@ -1,4 +1,4 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,26 +11,24 @@
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-    <TableRow
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent">
+    android:orientation="horizontal">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/i_owe"
             android:layout_weight="1"
-            android:text="@string/i_owe"/>
+            android:text="@string/i_owe" />
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/owe_me"
             android:layout_weight="1"
             android:text="@string/owe_me"/>
-    </TableRow>
-    <TextView
+    </LinearLayout>
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/view_bills_column"/>
-    </LinearLayout>
-</ScrollView>
+        android:id="@+id/bill_list_view"
+        android:layout_gravity="center_horizontal"
+        tools:listitem="@android:layout/simple_list_item_1"/>
+</LinearLayout>
