@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.hjcyz1991.project407.Model.User;
 
@@ -84,8 +85,12 @@ public class AddGroups extends ActionBarActivity{
                         selectedItemsID.add(contactsBackendID[position]);
                     }
                 }
-                if(!added)
+                if(!added){
+                    Toast.makeText(AddGroups.this, "Please select at least one friend",
+                            Toast.LENGTH_SHORT).show();
                     return;
+
+                }
                 String[] outputStrArr = new String[selectedItems.size()];
                 for (int i = 0; i < selectedItems.size(); i++) {
                     outputStrArr[i] = selectedItems.get(i);

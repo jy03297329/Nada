@@ -13,9 +13,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.hjcyz1991.project407.Model.Bill;
 import com.example.hjcyz1991.project407.Model.User;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ViewBills extends ActionBarActivity {
@@ -32,7 +36,7 @@ public class ViewBills extends ActionBarActivity {
                 .setSwipeBackView(R.layout.swipeback_default);
         iOwe = (Button)findViewById(R.id.i_owe);
         oweMe = (Button)findViewById(R.id.owe_me);
-//        iOwe.setPressed(true);
+
         billList = (ListView)findViewById(R.id.bill_list_view);
 
         iOwe.setOnClickListener(new View.OnClickListener() {
@@ -40,7 +44,7 @@ public class ViewBills extends ActionBarActivity {
             public void onClick(View v) {
                 iOwe.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                 oweMe.setBackgroundResource(android.R.drawable.btn_default);
-
+                List<Bill> billPay = MainActivity.user.getBillPay();
 
             }
         });
@@ -50,8 +54,12 @@ public class ViewBills extends ActionBarActivity {
             public void onClick(View v) {
                 oweMe.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                 iOwe.setBackgroundResource(android.R.drawable.btn_default);
+                List<Bill> billRec = MainActivity.user.getBillRec();
+
             }
         });
+
+        iOwe.performClick();
     }
 
 

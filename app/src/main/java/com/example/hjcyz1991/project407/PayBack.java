@@ -1,5 +1,6 @@
 package com.example.hjcyz1991.project407;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -9,13 +10,21 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
 
+import org.w3c.dom.Text;
 
-public class PayBack extends ActionBarActivity {
+
+public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Communicator{
+    private EditText payback_search;
+    private Button pay;
+    private TextView infoView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,6 +33,9 @@ public class PayBack extends ActionBarActivity {
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_pay_back)
                 .setSwipeBackView(R.layout.swipeback_default);
+        payback_search = (EditText)findViewById(R.id.pay_back_search);
+        pay = (Button)findViewById(R.id.button_pay);
+        infoView = (TextView)findViewById(R.id.pay_back_info);
     }
 
 
@@ -56,5 +68,16 @@ public class PayBack extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDialogMessage(String message) {
+        String receiver = "XXX";
+        FragmentManager fm = getFragmentManager();
+        PaymentMethodDialog paymentDialog = new PaymentMethodDialog();
+        paymentDialog.show(fm, "PaymentDialog");
+        Bundle data = new Bundle();
+        data.putString("receiver", receiver);
+        paymentDialog.setArguments(data);
     }
 }

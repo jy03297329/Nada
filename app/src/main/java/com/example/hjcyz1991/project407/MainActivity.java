@@ -85,9 +85,6 @@ public class MainActivity extends ActionBarActivity {
         });
 
                 //Get user
-        String userBackendID = SaveSharedPreference.getUserName(this);
-        List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
-        user = users.get(0);
 
         listViewBills = (ListView) findViewById(R.id.list_view_bills);
 
@@ -99,6 +96,7 @@ public class MainActivity extends ActionBarActivity {
 
         balance = (TextView) findViewById(R.id.balance);
         balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));
+
 
         String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
