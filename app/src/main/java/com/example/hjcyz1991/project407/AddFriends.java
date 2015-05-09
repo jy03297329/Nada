@@ -17,13 +17,11 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.hjcyz1991.project407.Model.Backend;
 import com.example.hjcyz1991.project407.Model.Friendship;
 import com.example.hjcyz1991.project407.Model.User;
-
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class AddFriends extends ActionBarActivity {
@@ -31,6 +29,9 @@ public class AddFriends extends ActionBarActivity {
     EditText searchBox;
     View focusView = null;
     Boolean cancel = false;
+    private static final String EMAIL_PATTERN =
+            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
+                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
 
     EditText search;
 
@@ -112,11 +113,6 @@ public class AddFriends extends ActionBarActivity {
         });
         //get value user typed in the search box
         String searchVal = searchBox.getText().toString();
-
-
-        //enter trigger search action
-
-
         System.out.println(searchVal);
     }
 
@@ -153,7 +149,9 @@ public class AddFriends extends ActionBarActivity {
     }
 
     private boolean isEmailValid(String email) {
-        return email.contains("@") && email.contains(".");
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
     }
 
 

@@ -55,7 +55,7 @@ public class AddGroups extends ActionBarActivity{
             contactsBackendID[i] = contacts.get(i).backendId;
             names[i] = contacts.get(i).name;
         }
-        contactsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, items);
+        contactsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_checked, names);
 
         contactsView.setAdapter(contactsAdapter);
         cancel = (Button)findViewById(R.id.button_cancel);
@@ -70,6 +70,7 @@ public class AddGroups extends ActionBarActivity{
         group.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean added = false;
                 SparseBooleanArray checked = contactsView.getCheckedItemPositions();
                 ArrayList<String> selectedItems = new ArrayList<String>();
                 ArrayList<Integer> selectedItemsID = new ArrayList<Integer>();
@@ -78,10 +79,13 @@ public class AddGroups extends ActionBarActivity{
                     int position = checked.keyAt(i);
                     // Add sport if it is checked i.e.) == TRUE!
                     if (checked.valueAt(i)){
+                        added = true;
                         selectedItems.add(contactsAdapter.getItem(position));
                         selectedItemsID.add(contactsBackendID[position]);
                     }
                 }
+                if(!added)
+                    return;
                 String[] outputStrArr = new String[selectedItems.size()];
                 for (int i = 0; i < selectedItems.size(); i++) {
                     outputStrArr[i] = selectedItems.get(i);

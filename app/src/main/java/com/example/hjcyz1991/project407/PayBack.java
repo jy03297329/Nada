@@ -11,6 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.hannesdorfmann.swipeback.Position;
+import com.hannesdorfmann.swipeback.SwipeBack;
+
 
 public class PayBack extends ActionBarActivity {
 
@@ -18,6 +21,9 @@ public class PayBack extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay_back);
+        SwipeBack.attach(this, Position.LEFT)
+                .setContentView(R.layout.activity_pay_back)
+                .setSwipeBackView(R.layout.swipeback_default);
     }
 
 
@@ -28,6 +34,7 @@ public class PayBack extends ActionBarActivity {
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER );
+
         TextView actionbarTitle = (TextView)actionbar.findViewById(R.id.actionbar_title);
         actionbarTitle.setText("Pay Back");
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
