@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hjcyz1991.project407.Model.Backend;
 import com.example.hjcyz1991.project407.Model.Bill;
 import com.example.hjcyz1991.project407.Model.User;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -30,6 +31,7 @@ import com.google.gson.Gson;
 
 import java.io.IOError;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -48,11 +50,14 @@ public class MainActivity extends ActionBarActivity {
     private Button settings;
     private final int LOGGED_OUT = 1;
     private GCMClientManager pushClientManager;
+    private final Bolean canContinue = new Bolean();
 
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
+    private final List<Bill> mainContent = new ArrayList<Bill>();
 
     String PROJECT_NUMBER = "16617277799";
     String regId;
@@ -62,16 +67,18 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        pushClientManager = new GCMClientManager(this, PROJECT_NUMBER);
+        String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
+        Log.d("MAIN_ACTIVITY", "getting user ID from login activity: " + userBackendID);
+        List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
+        user = users.get(0);
+        pushClientManager = new GCMClientManager(this, PROJECT_NUMBER, user);
         pushClientManager.registerIfNeeded(new GCMClientManager.RegistrationCompletedHandler() {
             @Override
             public void onSuccess(String registrationId, boolean isNewRegistration) {
-                Toast.makeText(MainActivity.this, registrationId,
-                        Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, registrationId,
+                        //Toast.LENGTH_SHORT).show();
                 regId = registrationId;
-                // SEND async device registration to your back-end server
-                // linking user with device registration id
-                // POST https://my-back-end.com/devices/register?user_id=123&device_id=abc
+
             }
             @Override
             public void onFailure(String ex) {
@@ -83,11 +90,8 @@ public class MainActivity extends ActionBarActivity {
         });
 
                 //Get user
-        String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
-        Log.d("MAIN_ACTIVITY", "getting user ID from login activity: " + userBackendID);
-        List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
-        user = users.get(0);
-        Log.d("MAIN_ACTIVITY", user.getAllBill().toString());
+
+        Log.d("MAIN_ACTIVITY", user.getAllBillId().toString());
 
         listViewBills = (ListView) findViewById(R.id.list_view_bills);
 
@@ -100,19 +104,56 @@ public class MainActivity extends ActionBarActivity {
         balance = (TextView) findViewById(R.id.balance);
         balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));
 
-        Bill bill = new Bill();
+        /*Bill bill = new Bill();
         bill.amount = 99.99;
         bill.backendId = 123;
-        bill.creditor_id = 789;
+        bill.creditor_id = 789;*/
 
-        List<Bill> mainContent = user.getBillPay();
+        ActivityTask mActivityTask = new ActivityTask();
+        Log.d(null, "new activityTask constructed");
+
+
+        Backend.getRecentActivities(user.authToken, Integer.toString(user.backendId),
+                new Backend.BackendCallback() {
+                    @Override
+                    public void onRequestCompleted(Object result) {
+                        mainContent.addAll((List<Bill>) result);
+                        canContinue.release();
+                    }
+
+                    @Override
+                    public void onRequestFailed(final String message) {
+                        Log.d(null, "Received error from Backend: " + message);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        canContinue.release();
+                    }
+                });
+
+
+        //mActivityTask.execute((Void) null);
+        //mActivityTask.execute()
+        //while(!canContinue.check()){}
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        //Log.d(null, mainContent.toString());
         String[] mainContentStr = new String[mainContent.size()];
         for(int i = 0; i < mainContent.size(); i++){
-            mainContentStr[i] = mainContent.get(i).toString();
+            mainContentStr[i] = mainContent.get(i).toString(user.backendId);
+            Log.d(null, mainContent.toString());
         }
 //        mainContentStr[0] = bill.toString();
 //        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mainContentStr);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                mainContentStr);
 
         listViewBills.setAdapter(arrayAdapter);
 
@@ -221,6 +262,38 @@ public class MainActivity extends ActionBarActivity {
         if (resultCode == LOGGED_OUT) {
             finish();
         }
+    }
+
+    public class ActivityTask extends AsyncTask<Void, Void, Boolean>{
+
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            final String TAG = "ACTIVITY";
+            Log.d(TAG, "excuting");
+            Backend.getRecentActivities(user.authToken, Integer.toString(user.backendId),
+                    new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    mainContent.addAll((List<Bill>)result);
+                    canContinue.release();
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    canContinue.release();
+                }
+            });
+            return true;
+        }
+
     }
 
 

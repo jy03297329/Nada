@@ -42,6 +42,8 @@ public class AddFriends extends ActionBarActivity {
 
     private User user;
     private User friend = new User();
+    private CheckFriendTask mCheckFriendTask = null;
+    final private List<User> oldFriends = new ArrayList<User>();
     private SearchFriendTask mSearchFriendTask = null;
     private Lock searchLock = new Lock();
 
@@ -53,6 +55,8 @@ public class AddFriends extends ActionBarActivity {
         public void lock(){ locker = true;}
     }
 
+    private Bolean canContinue = new Bolean();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +66,6 @@ public class AddFriends extends ActionBarActivity {
         user = users.get(0);
         //List<User> curUserFriends = user.getFriends();
         final List<String> friendEmails = new ArrayList<String>();
-        //for(User i : curUserFriends){
-          //  friendEmails.add(i.email);
-        //}
-        //Log.d("friendsEmail", friendEmails.size() + " friends");
         searchBox = (EditText) findViewById(R.id.search);
         searchBox.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -91,22 +91,29 @@ public class AddFriends extends ActionBarActivity {
                     if (cancel) {
                         focusView.requestFocus();
                     }
+
                     searchLock.lock();
-                    Log.d(null, "search again?");
-                    if(friendEmails.contains(searchVal)){
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(),
-                                        "You are already friends.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        return false;
-                    }
                     mSearchFriendTask = new SearchFriendTask(searchVal);
                     mSearchFriendTask.execute();
                     while(searchLock.isLocked()){};
-                    new AddFriendTask(searchVal).execute();
+                    if(canContinue.check()){
+                        searchLock.lock();
+                        canContinue.lock();
+                        mCheckFriendTask = new CheckFriendTask(Integer.toString(friend.backendId),
+                                searchVal);
+                        mCheckFriendTask.execute();
+                    }else{
+                        return false;
+                    }
+                    while(searchLock.isLocked()){};
+                    if(canContinue.check()){
+                        new AddFriendTask(searchVal).execute();
+                    }else{
+                        return false;
+                    }
+
+                    //while(searchLock.isLocked()){if(canAdd.check()) return false;};
+
                     System.out.println(searchVal);
                     return true;
                 }
@@ -159,10 +166,13 @@ public class AddFriends extends ActionBarActivity {
 
     public class SearchFriendTask extends AsyncTask<Void, Void, Boolean> {
         private final String mEmail;
+        //private Bolean canContinue;
 
         SearchFriendTask(String email) {
             mEmail = email;
             searchLock.lock();
+           // canContinue = new Bolean();
+
         }
 
         @Override
@@ -176,6 +186,7 @@ public class AddFriends extends ActionBarActivity {
                     //store the friend name
                     friend.copy((User) result);
                     searchLock.release();
+                    canContinue.release();
                     Log.d(TAG, "friendId: " + Integer.toString(friend.backendId));
                 }
 
@@ -188,19 +199,71 @@ public class AddFriends extends ActionBarActivity {
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
                     });
+                    searchLock.release();
+                    canContinue.lock();
                 }
             });
-            if(searchLock.isLocked())
-                Log.d(TAG, "locked");
-            return (!searchLock.isLocked());
+
+
+            return (canContinue.check());
         }
         @Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
                 Log.d("SEARCH_TASK", "search user succeeded");
+                //mCheckFriendTask = new CheckFriendTask(Integer.toString(friend.backendId), mEmail);
+                //mCheckFriendTask.execute();
                 //while (searchLock.isLocked()) {};
             }else{
 
+            }
+        }
+    }
+
+    public class CheckFriendTask extends AsyncTask<Void, Void, Boolean> {
+
+        //private String email;
+        private String friendId;
+
+        CheckFriendTask(String id, String e){
+            //email = e;
+            friendId = id;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            final String TAG = "LOGIN_ACTIVITY_LF";
+
+            Backend.searchFriendship(Integer.toString(user.backendId), user.authToken, friendId,
+                    new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), "You are already friends.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    searchLock.release();
+                    canContinue.lock();
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    searchLock.release();
+                    canContinue.release();
+                }
+            });
+            while(searchLock.isLocked()){};
+            return canContinue.check();
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                //new AddFriendTask(email).execute();
             }
         }
     }
@@ -222,23 +285,6 @@ public class AddFriends extends ActionBarActivity {
             Backend.addFriend(user.backendId, user.authToken, mEmail, new Backend.BackendCallback() {
                 @Override
                 public void onRequestCompleted(Object result) {
-                    //int friendId = (int)result;
-                    /*List<User> resultUser = User.find(User.class, "backend_id = ?", new Integer(
-                            friend.backendId).toString());
-                    User newUser;
-                    if (resultUser.size() > 1) Log.d(TAG, "duplicate users: " + resultUser.size());
-                    if (resultUser.size() == 0) {
-                        newUser = new User();
-                        newUser.backendId = friend.backendId;
-                        newUser.save();
-                    } else {
-                        newUser = resultUser.get(0);
-                    }*/
-
-                    //Friendship record1 = new Friendship(user, newUser);
-                    //record1.save();
-                    //Log.d(TAG, "saving : " + record1.toString());
-                    //new Friendship(newUser, user).save();
 
                 }
 
@@ -259,7 +305,17 @@ public class AddFriends extends ActionBarActivity {
         @Override
         protected void onPostExecute(final Boolean success) {
 
-            finish();
+            if(success){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Added Successfully.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+                finish();
+            }
+
         }
 
     }
