@@ -132,15 +132,16 @@ public class Backend {
                 });
     }
 
-    public static void loadUserBill(final User user, final BackendCallback callback) {
+    public static void loadUserPayBill(final User user, final BackendCallback callback) {
         //final int userId = user.backendId;
-        final List<Bill> newBills = new ArrayList<Bill>();
+
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
         StringEntity jsonParams = null;
         try {
             JSONObject json = new JSONObject();
             json.put("cur_user_id", user.backendId);
             json.put("password", user.authToken);
+            Log.d("LOAD_USER_BILL", json.toString());
             jsonParams = new StringEntity(json.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -148,15 +149,13 @@ public class Backend {
         List<Header> headers = new ArrayList<Header>();
         headers.add(new BasicHeader("Accept", "application/json"));
         headers.add(new BasicHeader("Content-Type", "application/json"));
-        //headers.add(new BasicHeader("X-USER-ID", Integer.toString(user.backendId)));
-        //headers.add(new BasicHeader("X-AUTHENTICATION-TOKEN", user.authToken));
-
         client.post("bills/unpaid_bills", jsonParams, headers, new JsonResponseHandler() {
             @Override
             public void onSuccess() {
                 //JsonObject result = getContent().getAsJsonObject();
+                Log.d("UNPAID_BILLS", "in paid bills");
                 JsonArray billList = (JsonArray) getContent().getAsJsonObject().get("unpaid_bills");
-
+                List<Bill> newBills = new ArrayList<Bill>();
                 for (JsonElement element : billList) {
                     JsonObject bill = element.getAsJsonObject();
                     bill.addProperty("backendId", bill.get("id").toString());
@@ -165,7 +164,7 @@ public class Backend {
                     newBills.add(gson.fromJson(bill, Bill.class));
                     //Log.d(null, newBill.toString());
                 }
-                //callback.onRequestCompleted(newBills);
+                callback.onRequestCompleted(newBills);
             }
 
             @Override
@@ -175,12 +174,30 @@ public class Backend {
                 callback.onRequestFailed(handleFailure(getContent()));
             }
         });
+    }
+
+    public static void loadUserRecBill(final User user, final BackendCallback callback) {
+        //final int userId = user.backendId;
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", user.backendId);
+            json.put("password", user.authToken);
+            Log.d("LOAD_USER_BILL", json.toString());
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
         client.post("bills/unrec_bills", jsonParams, headers, new JsonResponseHandler() {
             @Override
             public void onSuccess() {
                 //JsonObject result = getContent().getAsJsonObject();
-                JsonArray billList = (JsonArray) getContent().getAsJsonObject().get("unpaid_bills");
-                //List<Bill> newBills = new ArrayList<Bill>();
+                JsonArray billList = (JsonArray) getContent().getAsJsonObject().get("unrec_bills");
+                List<Bill> newBills = new ArrayList<Bill>();
                 for (JsonElement element : billList) {
                     JsonObject bill = element.getAsJsonObject();
                     bill.addProperty("backendId", bill.get("id").toString());
@@ -201,7 +218,9 @@ public class Backend {
         });
 
 
+
     }
+
 
 
 
@@ -334,8 +353,36 @@ public class Backend {
         });
     }
 
+    public static void searchFriendship(String curId, String password, String friendId,
+                                        final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", curId);
+            json.put("password", password);
+            json.put("friend_id", friendId);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.post("friendships/search", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                callback.onRequestCompleted(null);
+            }
+            @Override
+            public void onFailure(){
+                callback.onRequestFailed(null);
+            }
+        });
+    }
+
     //actually add event
-    public static void addBillEvent(User user, int totalAmt, String billName, String note,
+    public static void addBillEvent(User user, String totalAmt, String billName, String note,
                                int creditor_id, List<Bill> bills, final BackendCallback callback) {
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
         StringEntity jsonParams = null;
@@ -364,7 +411,17 @@ public class Backend {
         client.post("events", jsonParams, headers, new JsonResponseHandler() {
             @Override
             public void onSuccess() {
-                callback.onRequestCompleted(getContent().getAsJsonObject());
+                JsonArray bList = (JsonArray) getContent().getAsJsonObject().get("bills");
+                List<Bill> billList = new ArrayList<Bill>();
+                for(JsonElement e : bList){
+                    JsonObject json = e.getAsJsonObject();
+                    json.addProperty("backendId", json.get("id").toString());
+                    json.remove("id");
+                    Gson gson = new Gson();
+                    Bill newBill = gson.fromJson(json, Bill.class);
+                    billList.add(newBill);
+                }
+                callback.onRequestCompleted(billList);
             }
             @Override
             public void onFailure() {
@@ -374,6 +431,11 @@ public class Backend {
             }
         });
     }
+
+    //public static void destroyBillEvent(String id, String password, final BackendCallback){
+
+    //}
+
 
     public static void changePassword(String backendId, String name, String oldAuth, String newAuth,
                                       final BackendCallback callback){
@@ -398,7 +460,11 @@ public class Backend {
             public void onSuccess() {
                 JsonObject updatedUser = (JsonObject) getContent().
                         getAsJsonObject().get("user");
-                callback.onRequestCompleted(updatedUser);
+                updatedUser.addProperty("backendId", updatedUser.get("id").toString());
+                updatedUser.remove("id");
+                Gson gson = new Gson();
+                User upUser = gson.fromJson(updatedUser, User.class);
+                callback.onRequestCompleted(upUser);
 
             }
 
@@ -410,6 +476,109 @@ public class Backend {
             }
         });
 
+    }
+
+    public static void settleBill(String backendId, String password, String billId,
+                                  final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", backendId);
+            json.put("password", password);
+            json.put("id", billId);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.post("bills/settle", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                JsonObject result = getContent().getAsJsonObject();
+                result.addProperty("backendId", result.get("id").toString());
+                result.remove("id");
+                Gson gson = new Gson();
+                Bill settledBill = gson.fromJson(result, Bill.class);
+                callback.onRequestCompleted(settledBill);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(null, "trying to settle bill");
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+    }
+
+    public static void registerUpdate(String id, String password, String reg_id, final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("password", password);
+            json.put("reg_id", reg_id);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.put("users/regid/" + id, jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                callback.onRequestCompleted(null);
+            }
+
+            @Override
+            public void onFailure() {
+                callback.onRequestFailed(null);
+            }
+        });
+    }
+
+    public static void getRecentActivities(String password, String id, final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("password", password);
+            json.put("id", id);
+            jsonParams = new StringEntity(json.toString());
+            Log.d(TAG, json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.post("users/activity", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "success**************");
+                JsonArray bills = (JsonArray) getContent().getAsJsonObject().get("bills");
+                List<Bill> billList = new ArrayList<Bill>();
+                for (JsonElement e : bills) {
+                    JsonObject json = e.getAsJsonObject();
+                    json.addProperty("backendId", json.get("id").toString());
+                    json.remove("id");
+                    Log.d(TAG, json.toString());
+                    Gson gson = new Gson();
+                    billList.add(gson.fromJson(json, Bill.class));
+                }
+                callback.onRequestCompleted(billList);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(TAG, "activity failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
     }
 
     /* Convenience methods */

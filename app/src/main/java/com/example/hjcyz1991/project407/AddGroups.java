@@ -5,9 +5,11 @@ import android.app.ListFragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -20,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hjcyz1991.project407.Model.Backend;
 import com.example.hjcyz1991.project407.Model.User;
 
 import java.util.ArrayList;
@@ -35,6 +38,10 @@ public class AddGroups extends ActionBarActivity{
     private final int CONTACTS_SELECTED = 1;
     private int[] contactsBackendID;
     private String[] names;
+    private User user;
+    private GetFriendsTask mGetFriendsTask = null;
+    public final List<User> contacts = new ArrayList<User>();
+    private Bolean canContinue = new Bolean();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +49,21 @@ public class AddGroups extends ActionBarActivity{
         setContentView(R.layout.activity_add_groups);
         contactsView = (ListView)findViewById(R.id.contact_listView);
 
-        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
+        //String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
+
+        String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
+        List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
+        user = users.get(0);
+        canContinue.lock();
+        mGetFriendsTask = new GetFriendsTask();
+        mGetFriendsTask.execute();
+
+        while(!canContinue.check()){};
 
 
-        List<User> contacts = MainActivity.user.getFriends();
+
         //for testing only with the temp items array
-        contactsBackendID = new int[items.length];
+        contactsBackendID = new int[contacts.size()];
 //        contactsBackendID = new int[contacts.size()];
 
         names = new String[contacts.size()];
@@ -140,5 +156,34 @@ public class AddGroups extends ActionBarActivity{
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class GetFriendsTask extends AsyncTask<Void, Void, Boolean>{
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            Backend.loadUserFriends(user, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    contacts.addAll((List<User>) result);
+                    canContinue.release();
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    canContinue.release();
+                }
+            });
+            return true;
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+        }
     }
 }

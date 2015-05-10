@@ -78,58 +78,66 @@ public class User extends SugarRecord<User>{
         //Log.d(null, StringUtil.toSQLName("debtor_id"));
         String query = new StringBuilder()
                 .append(StringUtil.toSQLName("debtor_id"))
-                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
                 .append(" = ?").toString();
-        return Bill.find(Bill.class, query,
-                Integer.toString(this.backendId), "false");
+        List<Bill> result = Bill.find(Bill.class, query,
+                Integer.toString(this.backendId));
+        for(Bill i : result){
+            if(i.settled)
+                result.remove(i);
+        }
+        return result;
     }
     public List<Bill> getBillRec(){
         String query = new StringBuilder()
                 .append(StringUtil.toSQLName("creditor_id"))
-                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
                 .append(" = ?").toString();
-        return Bill.find(Bill.class, query,
-                Integer.toString(this.backendId), "false");
+        List<Bill> result = Bill.find(Bill.class, query,
+                Integer.toString(this.backendId));
+        for(Bill i : result){
+            if(i.settled)
+                result.remove(i);
+        }
+        return result;
     }
     public List<Bill> getBillSettled(){
-        String query1 = new StringBuilder()
-                .append(StringUtil.toSQLName("debtor_id"))
-                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
-                .append(" = ?").toString();
-        String query2 = new StringBuilder()
-                .append(StringUtil.toSQLName("creditor_id"))
-                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
-                .append(" = ?").toString();
-        List<Bill> result = Bill.find(Bill.class, query1,
-                Integer.toString(this.backendId), "true");
-        result.addAll(Bill.find(Bill.class, query2,
-                Integer.toString(this.backendId), "true"));
+        List<Bill> result = this.getAllBill();
+
+        for(Bill i : result){
+            if(!i.settled)
+                result.remove(i);
+        }
         return result;
     }
 
     public List<Bill> getBillUnsettled(){
+        List<Bill> result = this.getAllBill();
+
+        for(Bill i : result){
+            if(i.settled)
+                result.remove(i);
+        }
+        return result;
+    }
+
+    public List<Bill> getAllBill(){
         String query1 = new StringBuilder()
                 .append(StringUtil.toSQLName("debtor_id"))
-                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
-                .append(" = ?").toString();
-        String query2 = new StringBuilder()
-                .append(StringUtil.toSQLName("creditor_id"))
-                .append(" = ? and ").append(StringUtil.toSQLName("settled"))
                 .append(" = ?").toString();
         List<Bill> result = Bill.find(Bill.class, query1,
-                Integer.toString(this.backendId), "false");
+                Integer.toString(this.backendId));
+        String query2 = new StringBuilder()
+                .append(StringUtil.toSQLName("creditor_id"))
+                .append(" = ?").toString();
         result.addAll(Bill.find(Bill.class, query2,
-                Integer.toString(this.backendId), "false"));
+                Integer.toString(this.backendId)));
         return result;
     }
 
     public List<Integer> getAllBillId(){
-        List<Bill> result = this.getBillSettled();
-        result.addAll(this.getBillUnsettled());
+        List<Bill> result = this.getAllBill();
         List<Integer> resultId = new ArrayList<Integer>();
-        for(Bill i : result){
+        for(Bill i : result)
             resultId.add(i.backendId);
-        }
 
         return resultId;
     }

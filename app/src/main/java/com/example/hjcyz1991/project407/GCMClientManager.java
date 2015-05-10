@@ -12,6 +12,8 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.example.hjcyz1991.project407.Model.Backend;
+import com.example.hjcyz1991.project407.Model.User;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -28,6 +30,7 @@ public class GCMClientManager {
     private String regid;
     private String projectNumber;
     private Activity activity;
+    private User user;
 
     public static abstract class RegistrationCompletedHandler {
         public abstract void onSuccess(String registrationId, boolean isNewRegistration);
@@ -39,10 +42,11 @@ public class GCMClientManager {
         }
     }
 
-    public GCMClientManager(Activity activity, String projectNumber) {
+    public GCMClientManager(Activity activity, String projectNumber, User u) {
         this.activity = activity;
         this.projectNumber = projectNumber;
         this.gcm = GoogleCloudMessaging.getInstance(activity);
+        this.user = u;
     }
 
     // Register if needed or fetch from local store
@@ -50,12 +54,12 @@ public class GCMClientManager {
         if (checkPlayServices()) {
             regid = getRegistrationId(getContext());
 
-            if (regid.isEmpty()) {
+            //if (regid.isEmpty()) {
                 registerInBackground(handler);
-            } else { // got id from cache
+            //} else { // got id from cache
                 Log.i(TAG, regid);
                 handler.onSuccess(regid, false);
-            }
+           // }
         } else { // no play services
             Log.i(TAG, "No valid Google Play Services APK found.");
         }
@@ -77,6 +81,18 @@ public class GCMClientManager {
                     }
                     regid = gcm.register(projectNumber);
                     Log.i(TAG, regid);
+                    Backend.registerUpdate(Integer.toString(user.backendId), user.authToken,
+                            regid, new Backend.BackendCallback() {
+                                @Override
+                                public void onRequestCompleted(Object result) {
+                                    Log.d(null, "register updated");
+                                }
+
+                                @Override
+                                public void onRequestFailed(String message) {
+                                    Log.d(null, "register failed");
+                                }
+                            });
 
                     // Persist the regID - no need to register again.
                     storeRegistrationId(getContext(), regid);
