@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.hjcyz1991.project407.Model.Bill;
+import com.example.hjcyz1991.project407.Model.BillEvent;
 import com.example.hjcyz1991.project407.Model.User;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
@@ -36,6 +38,8 @@ public class ViewBills extends ActionBarActivity {
     private ArrayAdapter<String> arrayAdapterBillRec;
     private String[] billPayCtn;
     private String[] billRecCtn;
+    private boolean payClicked;
+    private BillEvent billEvent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +50,7 @@ public class ViewBills extends ActionBarActivity {
         iOwe = (Button)findViewById(R.id.i_owe);
         oweMe = (Button)findViewById(R.id.owe_me);
         final List<Bill> billPay = MainActivity.user.getBillPay();
-        List<Bill> billRec = MainActivity.user.getBillRec();
+        final List<Bill> billRec = MainActivity.user.getBillRec();
         billPayCtn = new String[] {"a", "B"};
 //        billPayCtn = new String[billPay.size()];
         billRecCtn = new String[billRec.size()];
@@ -66,6 +70,7 @@ public class ViewBills extends ActionBarActivity {
         iOwe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                payClicked = true;
                 iOwe.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                 oweMe.setBackgroundResource(android.R.drawable.btn_default);
                 billView.setAdapter(arrayAdapterBillPay);
@@ -96,6 +101,7 @@ public class ViewBills extends ActionBarActivity {
         oweMe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                payClicked = false;
                 oweMe.setBackgroundColor(getResources().getColor(android.R.color.darker_gray));
                 iOwe.setBackgroundResource(android.R.drawable.btn_default);
                 billView.setAdapter(arrayAdapterBillRec);
@@ -123,12 +129,28 @@ public class ViewBills extends ActionBarActivity {
 
             }
         });
-
-
-
-
         iOwe.performClick();
+        billView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ViewBills.this, EditBill.class);
+                Bundle bundle = new Bundle();
+                Bill clkedBill;
+//                billEvent =
+                if(payClicked)
+                    clkedBill = billPay.get(position);
+                else
+                    clkedBill = billRec.get(position);
 
+                bundle.putString("name", billEvent.name);
+                bundle.putDouble("amount", clkedBill.amount);
+                bundle.putString("notes", billEvent.note);
+                bundle.putInt("backendId", clkedBill.backendId);
+                intent.putExtras(bundle);
+                startActivity(intent);
+
+            }
+        });
     }
 
 

@@ -22,7 +22,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/bill_name_edit"
+            android:id="@+id/set_bill_name"
             android:maxLines="1"
             android:singleLine="true"
             />
@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:inputType="numberDecimal"
-            android:id="@+id/total_amount_edit"
+            android:id="@+id/set_total_amount"
             android:singleLine="true"
             />
     </LinearLayout>
@@ -91,7 +91,7 @@
             android:layout_height="159dp"
             android:inputType="textMultiLine"
             android:ems="10"
-            android:id="@+id/notes_edit"
+            android:id="@+id/set_notes"
             android:layout_gravity="center_horizontal" />
         </LinearLayout>
 
