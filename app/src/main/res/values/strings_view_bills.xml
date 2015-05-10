@@ -2,4 +2,5 @@
 <resources>
 <string name="i_owe">I Owe</string>
 <string name="owe_me">Owe Me</string>
+<string name="edit_bill">Edit Bill</string>
 </resources>

@@ -173,7 +173,7 @@
         <activity
             android:name=".ChangePassword"
             android:label="@string/title_activity_change_password"
-            android:parentActivityName=".Profile">
+            android:parentActivityName=".Profile" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.hjcyz1991.project407.Profile" />
@@ -201,7 +201,10 @@
 
         <service android:name=".GcmIntentService" />
 
-
+        <activity
+            android:name=".EditBill"
+            android:label="@string/title_activity_edit_bill" >
+        </activity>
     </application>
 
 </manifest>
