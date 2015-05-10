@@ -2,9 +2,11 @@ package com.example.hjcyz1991.project407;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hjcyz1991.project407.Model.Backend;
 import com.example.hjcyz1991.project407.Model.Bill;
 import com.example.hjcyz1991.project407.Model.BillEvent;
 import com.example.hjcyz1991.project407.Model.User;
@@ -40,9 +43,14 @@ public class ViewBills extends ActionBarActivity {
     private String[] billRecCtn;
     private boolean payClicked;
     private BillEvent billEvent;
+    private removeBillTask mRemoveBillTask;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
+        List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
+        user = users.get(0);
         setContentView(R.layout.activity_view_bills);
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_view_bills)
@@ -51,7 +59,7 @@ public class ViewBills extends ActionBarActivity {
         oweMe = (Button)findViewById(R.id.owe_me);
         final List<Bill> billPay = MainActivity.user.getBillPay();
         final List<Bill> billRec = MainActivity.user.getBillRec();
-        billPayCtn = new String[] {"a", "B"};
+        billPayCtn = new String[billPay.size()];
 //        billPayCtn = new String[billPay.size()];
         billRecCtn = new String[billRec.size()];
 
@@ -87,6 +95,14 @@ public class ViewBills extends ActionBarActivity {
                                     public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                         for (int position : reverseSortedPositions) {
                                             arrayAdapterBillPay.remove(arrayAdapterBillPay.getItem(position));
+                                            user.moneyPay -= billPay.get(position).amount;
+                                            mRemoveBillTask = new removeBillTask(
+                                                    Integer.toString(billPay.get(position).backendId),
+                                                    Integer.toString(user.backendId), user.authToken,
+                                                    Integer.toString(billPay.get(position).event_id));
+                                            mRemoveBillTask.execute();
+
+
                                         }
                                         arrayAdapterBillPay.notifyDataSetChanged();
                                     }
@@ -118,6 +134,13 @@ public class ViewBills extends ActionBarActivity {
                                     public void onDismiss(ListView listView, int[] reverseSortedPositions) {
                                         for (int position : reverseSortedPositions) {
                                             arrayAdapterBillRec.remove(arrayAdapterBillRec.getItem(position));
+                                            user.moneyRec -= billRec.get(position).amount;
+                                            mRemoveBillTask = new removeBillTask(
+                                                    Integer.toString(billRec.get(position).backendId),
+                                                    Integer.toString(user.backendId), user.authToken,
+                                                    Integer.toString(billRec.get(position).event_id));
+                                            mRemoveBillTask.execute();
+
                                         }
                                         arrayAdapterBillRec.notifyDataSetChanged();
                                     }
@@ -136,7 +159,9 @@ public class ViewBills extends ActionBarActivity {
                 Intent intent = new Intent(ViewBills.this, EditBill.class);
                 Bundle bundle = new Bundle();
                 Bill clkedBill;
-//                billEvent =
+                List<BillEvent> billEvents = BillEvent.find(BillEvent.class, "backend_id = ?",
+                        Integer.toString(billPay.get(position).event_id));
+                billEvent = billEvents.get(0);
                 if(payClicked)
                     clkedBill = billPay.get(position);
                 else
@@ -169,6 +194,66 @@ public class ViewBills extends ActionBarActivity {
         getSupportActionBar().setCustomView(actionbar, params);
         return true;
     }
+
+    public class removeBillTask extends AsyncTask<Void, Void, Boolean>{
+        private String billId;
+        private String userId;
+        private String password;
+        private String eventId;
+
+        removeBillTask(String b, String u, String p, String e){
+            billId = b;
+            userId = u;
+            password = p;
+            eventId = e;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            final String TAG = "REMOVE_BILL_TASK";
+
+            Backend.destroyBill(billId, userId, password, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    final String message = (String) result;
+                    Log.d(TAG, message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    Log.d(TAG, message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+            return true;
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if (success) {
+                List<BillEvent> events = BillEvent.find(BillEvent.class, "backend_id = ?", eventId);
+
+                List<Bill> bills = Bill.find(Bill.class, "backend_id = ?", billId);
+                events.get(0).totalAmount -= bills.get(0).amount;
+
+                for(Bill i : bills)
+                    i.delete();
+
+            }
+        }
+    }
+
 //
 //    @Override
 //    public boolean onOptionsItemSelected(MenuItem item) {

@@ -48,6 +48,7 @@ public class GcmIntentService extends IntentService {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
 
+    private final int bodyLen = 10;
     public static List<String> body = new ArrayList<String>();
 
     public GcmIntentService() {
@@ -69,9 +70,13 @@ public class GcmIntentService extends IntentService {
             if(idx != 0) {
                 body.remove(inBody);
                 body.add(0, inBody);
+                if(body.size() > bodyLen)
+                    body.remove(bodyLen);
             }
         }else{
             body.add(0, inBody);
+            if(body.size() > bodyLen)
+                body.remove(bodyLen);
         }
         Log.d("GCM", body.toString());
 

@@ -33,6 +33,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -52,6 +53,8 @@ public class MainActivity extends ActionBarActivity {
     private GCMClientManager pushClientManager;
     private final Bolean canContinue = new Bolean();
 
+    //private boolean stillAtMain = true;
+
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
@@ -65,6 +68,7 @@ public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //stillAtMain = true;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -100,8 +104,8 @@ public class MainActivity extends ActionBarActivity {
         bill.backendId = 123;
         bill.creditor_id = 789;*/
 
-        ActivityTask mActivityTask = new ActivityTask();
-        Log.d(null, "new activityTask constructed");
+        //ActivityTask mActivityTask = new ActivityTask();
+        //Log.d(null, "new activityTask constructed");
 
 
         /*Backend.getRecentActivities(user.authToken, Integer.toString(user.backendId),
@@ -165,10 +169,12 @@ public class MainActivity extends ActionBarActivity {
 //        mainContentStr[0] = bill.toString();
 //        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
         Log.d("********", mainContentString.toString());
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_list_item_1,
                 mainContentString);
 
         listViewBills.setAdapter(arrayAdapter);
+
 
 
     }
@@ -193,6 +199,7 @@ public class MainActivity extends ActionBarActivity {
         addNewBill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, AddNewBill.class);
                 startActivity(intent);
             }
@@ -202,6 +209,7 @@ public class MainActivity extends ActionBarActivity {
         payBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, PayBack.class);
                 startActivity(intent);
             }
@@ -211,6 +219,7 @@ public class MainActivity extends ActionBarActivity {
         sendReminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, SendReminder.class);
                 startActivity(intent);
             }
@@ -220,6 +229,7 @@ public class MainActivity extends ActionBarActivity {
         viewBills.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, ViewBills.class);
                 startActivity(intent);
             }
@@ -229,6 +239,7 @@ public class MainActivity extends ActionBarActivity {
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, Profile.class);
                 startActivity(intent);
             }
@@ -238,6 +249,7 @@ public class MainActivity extends ActionBarActivity {
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, Settings.class);
                 startActivityForResult(intent, LOGGED_OUT);
             }
@@ -255,6 +267,7 @@ public class MainActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_add_friends:
+                //stillAtMain = false;
                 Intent intentAddFriends = new Intent(MainActivity.this, AddFriends.class);
                 startActivity(intentAddFriends);
                 return true;
@@ -263,6 +276,7 @@ public class MainActivity extends ActionBarActivity {
 //                startActivity(intentAddGroups);
 //                return true;
             case R.id.action_scan_ur_code:
+                //stillAtMain = false;
                 Intent intentScanURCode = new Intent(this, ScanQRCode.class);
                 startActivity(intentScanURCode);
                 return true;

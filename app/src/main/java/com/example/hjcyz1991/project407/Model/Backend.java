@@ -455,8 +455,9 @@ public class Backend {
                 //String msg = new Gson().fromJson(getContent().getAsJsonObject(), String.class);
                 callback.onRequestCompleted(handleFailure(getContent()));
             }
+
             @Override
-            public void onFailure(){
+            public void onFailure() {
                 callback.onRequestFailed(handleFailure(getContent()));
             }
         });
@@ -495,6 +496,36 @@ public class Backend {
             }
             @Override
             public void onFailure(){
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+    }
+
+    public static void destroyBill(String billId, String userId, String pwd,
+                                   final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", userId);
+            json.put("password", pwd);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+
+        client.delete("bills/" + billId, jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                //String msg = new Gson().fromJson(getContent().getAsJsonObject(), String.class);
+                callback.onRequestCompleted(handleFailure(getContent()));
+            }
+
+            @Override
+            public void onFailure() {
                 callback.onRequestFailed(handleFailure(getContent()));
             }
         });
