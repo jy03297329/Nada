@@ -413,7 +413,7 @@ public class Backend {
             public void onSuccess() {
                 JsonArray bList = (JsonArray) getContent().getAsJsonObject().get("bills");
                 List<Bill> billList = new ArrayList<Bill>();
-                for(JsonElement e : bList){
+                for (JsonElement e : bList) {
                     JsonObject json = e.getAsJsonObject();
                     json.addProperty("backendId", json.get("id").toString());
                     json.remove("id");
@@ -423,6 +423,7 @@ public class Backend {
                 }
                 callback.onRequestCompleted(billList);
             }
+
             @Override
             public void onFailure() {
                 Log.d(null, "trying to add bill event");
@@ -432,10 +433,72 @@ public class Backend {
         });
     }
 
-    //public static void destroyBillEvent(String id, String password, final BackendCallback){
+    public static void destroyBillEvent(String eventId, String userId, String password,
+                                        final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", userId);
+            json.put("password", password);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
 
-    //}
+        client.delete("events/" + eventId, jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                //String msg = new Gson().fromJson(getContent().getAsJsonObject(), String.class);
+                callback.onRequestCompleted(handleFailure(getContent()));
+            }
+            @Override
+            public void onFailure(){
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+    }
 
+    //public static void showBill(String )
+
+    public static void editBill(String userId, String pwd, String creditorId, String debtorId,
+                                String billId, String amt, final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", userId);
+            json.put("password", pwd);
+            json.put("creditor_id", creditorId);
+            json.put("debtor_id", debtorId);
+            json.put("id", billId);
+            json.put("amount", amt);
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+
+        client.put("bills/" + billId, jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                JsonObject json = getContent().getAsJsonObject();
+                json.addProperty("backendId", json.get("id").toString());
+                json.remove("id");
+                Bill updatedBill = new Gson().fromJson(json, Bill.class);
+                callback.onRequestCompleted(updatedBill);
+            }
+            @Override
+            public void onFailure(){
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+    }
 
     public static void changePassword(String backendId, String name, String oldAuth, String newAuth,
                                       final BackendCallback callback){
@@ -580,6 +643,8 @@ public class Backend {
             }
         });
     }
+
+
 
     /* Convenience methods */
 

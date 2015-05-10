@@ -28,6 +28,9 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This {@code IntentService} does the actual handling of the GCM message.
  * {@code GcmBroadcastReceiver} (a {@code WakefulBroadcastReceiver}) holds a
@@ -45,6 +48,8 @@ public class GcmIntentService extends IntentService {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
 
+    public static List<String> body = new ArrayList<String>();
+
     public GcmIntentService() {
         super("GcmIntentService");
     }
@@ -58,7 +63,17 @@ public class GcmIntentService extends IntentService {
         // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
         String title = extras.getString("title");
-        String body = extras.getString("body");
+        String inBody = new String(extras.getString("body"));
+        if(body.contains(inBody)) {
+            int idx = body.indexOf(inBody);
+            if(idx != 0) {
+                body.remove(inBody);
+                body.add(0, inBody);
+            }
+        }else{
+            body.add(0, inBody);
+        }
+        Log.d("GCM", body.toString());
 
         if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
             /*
@@ -83,7 +98,7 @@ public class GcmIntentService extends IntentService {
                 }
                 Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
                 // Post notification of received message.
-                sendNotification(title, body);
+                sendNotification(title, inBody);
                 Log.i(TAG, "Received: " + extras.toString());
             }
         }
@@ -94,7 +109,7 @@ public class GcmIntentService extends IntentService {
     // Put the message into a notification and post it.
     // This is just one simple example of what you might choose to do with
     // a GCM message.
-    private void sendNotification(String title, String body) {
+    private void sendNotification(String title, String b) {
         mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -106,8 +121,8 @@ public class GcmIntentService extends IntentService {
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle(title)
                         .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(body))
-                        .setContentText(body);
+                                .bigText(b))
+                        .setContentText(b);
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());

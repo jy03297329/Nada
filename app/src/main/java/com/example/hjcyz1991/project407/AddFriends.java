@@ -92,6 +92,17 @@ public class AddFriends extends ActionBarActivity {
                         focusView.requestFocus();
                     }
 
+                    if(searchVal.equals(user.email)){
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getApplicationContext(), "This is you...",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        return false;
+                    }
+
                     searchLock.lock();
                     mSearchFriendTask = new SearchFriendTask(searchVal);
                     mSearchFriendTask.execute();
