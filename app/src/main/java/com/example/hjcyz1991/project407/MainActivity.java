@@ -63,8 +63,6 @@ public class MainActivity extends ActionBarActivity {
     String PROJECT_NUMBER = "16617277799";
     String regId;
 
-//    private Bill[] bills;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -83,9 +83,9 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
         user = users.get(0);
         peopleEdit = (TextView) findViewById(R.id.people_edit);
         addContact = (Button) findViewById(R.id.button_add_contact);
-        billName = (EditText)findViewById(R.id.bill_name_edit);
-        totalAmt = (EditText)findViewById(R.id.total_amount_edit);
-        notes = (EditText)findViewById(R.id.notes_edit);
+        billName = (EditText)findViewById(R.id.set_bill_name);
+        totalAmt = (EditText)findViewById(R.id.set_total_amount);
+        notes = (EditText)findViewById(R.id.set_notes);
         addContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

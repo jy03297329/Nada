@@ -109,7 +109,7 @@
         <activity
             android:name=".AddGroups"
             android:label="@string/title_activity_add_groups"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".AddNewBill" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.hjcyz1991.project407.MainActivity" />
@@ -173,10 +173,18 @@
         <activity
             android:name=".ChangePassword"
             android:label="@string/title_activity_change_password"
-            android:parentActivityName=".Profile">
+            android:parentActivityName=".Profile" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.hjcyz1991.project407.Profile" />
+        </activity>
+        <activity
+            android:name=".EditBill"
+            android:label="@string/title_activity_edit_bill"
+            android:parentActivityName=".ViewBills">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.hjcyz1991.project407.ViewBills" />
         </activity>
         <activity android:name="com.paypal.android.sdk.payments.PayPalProfileSharingActivity" />
         <activity android:name="com.paypal.android.sdk.payments.ProfileSharingConsentActivity" />
@@ -200,7 +208,6 @@
         </receiver>
 
         <service android:name=".GcmIntentService" />
-
 
     </application>
 
