@@ -56,9 +56,33 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     private Bundle bundleFromSetAmt;
     private createBillEventTask mCreate;
 
+<<<<<<< HEAD
+=======
     private Bolean canContinue;
 
 
+    //private class BackendBill
+
+    // Can be NO_NETWORK for OFFLINE, SANDBOX for TESTING and LIVE for PRODUCTION
+    private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
+    // note that these credentials will differ between live & sandbox environments.
+    private static final String CONFIG_CLIENT_ID = "credential from developer.paypal.com";
+    // when testing in sandbox, this is likely the -facilitator email address.
+    private static final String CONFIG_RECEIVER_EMAIL = "your@email.com";
+
+    private static final int REQUEST_CODE_PAYMENT = 1;
+    private static final int REQUEST_CODE_FUTURE_PAYMENT = 2;
+    private static final int REQUEST_CODE_PROFILE_SHARING = 3;
+
+    private static PayPalConfiguration config = new PayPalConfiguration()
+            .environment(CONFIG_ENVIRONMENT)
+            .clientId(CONFIG_CLIENT_ID)
+            // The following are only used in PayPalFuturePaymentActivity.
+            .merchantName("Example Merchant")
+            .merchantPrivacyPolicyUri(Uri.parse("https://www.example.com/privacy"))
+            .merchantUserAgreementUri(Uri.parse("https://www.example.com/legal"));
+
+>>>>>>> 60f31f061a5394213abfa429f6d01b7a4a289993
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,14 +158,16 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
                     peopleEdit.requestFocus();
                     return;
                 }
+<<<<<<< HEAD
                 if(totalAmtView.getText().toString().trim().length() == 0){
                     totalAmtView.setError("Please input the amounts");
                     totalAmtView.requestFocus();
                     return;
                 }
+=======
 
                 List<Bill> bills = new ArrayList<Bill>();
-
+>>>>>>> 60f31f061a5394213abfa429f6d01b7a4a289993
                 String totalAmtStr = totalAmtView.getText().toString();
                 double totalAmt = Double.parseDouble(totalAmtStr);
                 String notesStr = notes.getText().toString();
@@ -256,23 +282,25 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
             notes.requestFocus();
             return;
         }
-
+<<<<<<< HEAD
         if(totalAmtView.getText().toString().trim().length() == 0){
             totalAmtView.setError("Please input the amount");
             totalAmtView.requestFocus();
             return;
         }
-
+        String receiver = "XXX";
+=======
         if(selectedItemsID.size() > 0) Log.d(null, "more than one creditor!");
         int creditorId = selectedItemsID.get(0);
         List<User> users = User.find(User.class, "backend_id = ?", Integer.toString(creditorId));
         String receiver = users.get(0).name;
+>>>>>>> 60f31f061a5394213abfa429f6d01b7a4a289993
         FragmentManager fm = getFragmentManager();
-//        PaymentMethodDialog paymentDialog = new PaymentMethodDialog();
-//        paymentDialog.show(fm, "PaymentDialog");
+        PaymentMethodDialog paymentDialog = new PaymentMethodDialog();
+        paymentDialog.show(fm, "PaymentDialog");
         Bundle data = new Bundle();
         data.putString("receiver", receiver);
-//        paymentDialog.setArguments(data);
+        paymentDialog.setArguments(data);
 
         double totalAmt = 0;
         List<Bill> bills = new ArrayList<Bill>();

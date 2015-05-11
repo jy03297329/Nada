@@ -432,13 +432,18 @@ public class Backend {
             json.put("total", totalAmt);
             json.put("note", note);
             json.put("creditor_id", creditor_id);
+
+            JSONArray jarray = new JSONArray();
+
             for (Bill i : bills) {
                 JSONObject billData = new JSONObject();
                 billData.put("debtor_id", i.debtor_id);
                 billData.put("amount", i.amount);
-                json.accumulate("bills", billData);
-            }
+                jarray.put(billData);
 
+            }
+            json.put("bills", jarray);
+            Log.d(null, json.toString());
             jsonParams = new StringEntity(json.toString());
         } catch (Exception e) {
             e.printStackTrace();

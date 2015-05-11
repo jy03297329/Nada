@@ -31,7 +31,7 @@ public class User extends SugarRecord<User>{
     public double moneyPay;
     public double moneyRec;
 
-    File avatar;
+    //File avatar;
 
     public User(){
         backendId = 0;

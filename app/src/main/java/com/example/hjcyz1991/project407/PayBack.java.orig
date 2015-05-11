@@ -132,15 +132,13 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
     @Override
-    protected  void onStop() {
-        super.onStop();
-        finish();
+    protected void onResume() {
+
+<<<<<<< HEAD
+        super.onResume();
+        this.onCreate(null);
     }
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        this.onCreate(null);
-//    }
+=======
     public class SettleTask extends AsyncTask<Void, Void, Boolean> {
 
         private String billId;
@@ -184,4 +182,7 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
             return true;
         }
     }
+
+>>>>>>> 60f31f061a5394213abfa429f6d01b7a4a289993
+
 }
