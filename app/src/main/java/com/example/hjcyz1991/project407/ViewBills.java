@@ -26,6 +26,7 @@ import com.example.hjcyz1991.project407.Model.BillEvent;
 import com.example.hjcyz1991.project407.Model.User;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
+import com.orm.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,13 +45,34 @@ public class ViewBills extends ActionBarActivity {
     private boolean payClicked;
     private BillEvent billEvent;
     private removeBillTask mRemoveBillTask;
+    private LoadUserPayBillTask mLoadPayBill;
+    private LoadUserRecBillTask mLoadRecBill;
+    private Bolean task1;
+    private Bolean task2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        task1 = new Bolean();
+        task2 = new Bolean();
         String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
+
+        task1.lock();
+        task2.lock();
+        mLoadPayBill = new LoadUserPayBillTask();
+        mLoadRecBill = new LoadUserRecBillTask();
+        mLoadPayBill.execute();
+        mLoadRecBill.execute();
+        //while(!(task1.check() && task2.check())){};
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         setContentView(R.layout.activity_view_bills);
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_view_bills)
@@ -64,10 +86,10 @@ public class ViewBills extends ActionBarActivity {
         billRecCtn = new String[billRec.size()];
 
         for(int i = 0; i < billPay.size(); i++){
-            billPayCtn[i] = billPay.get(i).toString();
+            billPayCtn[i] = billPay.get(i).toString(user.backendId);
         }
         for(int i = 0; i < billRec.size(); i++){
-            billRecCtn[i] = billRec.get(i).toString();
+            billRecCtn[i] = billRec.get(i).toString(user.backendId);
         }
         arrayAdapterBillPay = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(Arrays.asList(billPayCtn)));
         arrayAdapterBillRec = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(Arrays.asList(billRecCtn)));
@@ -200,12 +222,17 @@ public class ViewBills extends ActionBarActivity {
         private String userId;
         private String password;
         private String eventId;
+        private Bolean f;
+        private Bolean canContinue;
 
         removeBillTask(String b, String u, String p, String e){
             billId = b;
             userId = u;
             password = p;
             eventId = e;
+            f = new Bolean();
+            canContinue = new Bolean();
+            canContinue.lock();
         }
 
         @Override
@@ -223,6 +250,9 @@ public class ViewBills extends ActionBarActivity {
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
                     });
+
+                    f.release();
+                    canContinue.release();
                 }
 
                 @Override
@@ -234,9 +264,12 @@ public class ViewBills extends ActionBarActivity {
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
                     });
+                    f.lock();
+                    canContinue.release();
                 }
             });
-            return true;
+            while(canContinue.check()){};
+            return f.check();
         }
         @Override
         protected void onPostExecute(final Boolean success) {
@@ -245,11 +278,160 @@ public class ViewBills extends ActionBarActivity {
                 List<BillEvent> events = BillEvent.find(BillEvent.class, "backend_id = ?", eventId);
 
                 List<Bill> bills = Bill.find(Bill.class, "backend_id = ?", billId);
-                events.get(0).totalAmount -= bills.get(0).amount;
+                //events.get(0).totalAmount -= bills.get(0).amount;
 
                 for(Bill i : bills)
                     i.delete();
 
+            }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplicationContext(), "Already deleted.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }
+    }
+
+    public class LoadUserPayBillTask extends AsyncTask<Void, Void, Boolean> {
+
+        private Bolean canContinue;
+        private Bolean flag;
+
+        LoadUserPayBillTask() {
+            Log.d(null, "created a new billTask");
+            canContinue = new Bolean();
+            flag = new Bolean();
+        }
+
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            //while(!isCancelled()){
+            final String TAG = "LOGIN_ACTIVITY_LB";
+            Log.d(TAG, "billTask in");
+            Backend.loadUserPayBill(user, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    flag.release();
+                    final List<Bill> resultBills = (List<Bill>) result;
+                    final List<Bill> allBills = Bill.find(Bill.class,
+                            StringUtil.toSQLName("creditor_id") + " = ?",
+                            Integer.toString(user.backendId));
+                    Log.d(TAG, "BillList get success. User: " + user.toString());
+                    for(Bill i : allBills)
+                        i.delete();
+                    for (Bill i : resultBills) {
+                        //if (user.getAllBillId().contains(i.backendId)) {
+                            Bill newBill = new Bill();
+                            newBill.copy(i);
+                            newBill.save();
+                            Log.d(TAG, "new bill saved: " + newBill.toString());
+                        //}
+                    }
+                    task1.release();
+                    canContinue.release();
+                    //Log.d(TAG, "move on to main");
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    flag.lock();
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    task1.release();
+                    canContinue.release();
+
+                }
+            });
+            while(canContinue.check()){};
+            return flag.check();
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+;
+                //finish();
+            } else {
+                //mPasswordView.setError(getString(R.string.error_incorrect_password));
+                //mPasswordView.requestFocus();
+            }
+        }
+    }
+    public class LoadUserRecBillTask extends AsyncTask<Void, Void, Boolean> {
+
+        private Bolean canContinue;
+        private Bolean flag;
+
+        LoadUserRecBillTask() {
+            Log.d(null, "created a new billRecTask");
+            canContinue = new Bolean();
+            flag = new Bolean();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            //while(!isCancelled()){
+            final String TAG = "LOGIN_ACTIVITY_LB";
+            Log.d(TAG, "billRecTask in");
+            Backend.loadUserRecBill(user, new Backend.BackendCallback() {
+                @Override
+                public void onRequestCompleted(Object result) {
+                    //Log.d(null, "5");
+                    flag.release();
+                    final List<Bill> resultBills = (List<Bill>) result;
+                    final List<Bill> allBills = Bill.find(Bill.class,
+                            StringUtil.toSQLName("creditor_id") + " = ?",
+                            Integer.toString(user.backendId));
+                    Log.d(TAG, "*****" + allBills.toString());
+                    //final List<Integer> allBillsId = new ArrayList<Integer>();
+                    for(Bill i : allBills) {
+                        //allBillsId.add(i.backendId);
+                        i.delete();
+                    }
+                    Log.d(TAG, "BillList get success. User: " + user.toString());
+                    for (Bill i : resultBills) {
+                        //if (!allBillsId.contains(i.backendId)) {
+                            Bill newBill = new Bill();
+                            newBill.copy(i);
+                            newBill.save();
+                            Log.d(TAG, "new bill saved: " + newBill.toString());
+                        //}
+                    }
+                    task2.release();
+                    canContinue.release();
+                    Log.d(TAG, "move on to main");
+                }
+
+                @Override
+                public void onRequestFailed(final String message) {
+                    flag.lock();
+                    Log.d(TAG, "Received error from Backend: " + message);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    task2.release();
+                    canContinue.release();
+                }
+            });
+            while(canContinue.check()){};
+            return flag.check();
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+            } else {
             }
         }
     }

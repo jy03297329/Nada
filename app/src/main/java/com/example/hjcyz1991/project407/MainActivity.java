@@ -93,17 +93,7 @@ public class MainActivity extends ActionBarActivity {
                 // exponential back-off when retrying.
             }
         });
-
-                //Get user
-
         Log.d("MAIN_ACTIVITY", user.getAllBillId().toString());
-
-
-        /*Bill bill = new Bill();
-        bill.amount = 99.99;
-        bill.backendId = 123;
-        bill.creditor_id = 789;*/
-
         //ActivityTask mActivityTask = new ActivityTask();
         //Log.d(null, "new activityTask constructed");
 
@@ -166,12 +156,12 @@ public class MainActivity extends ActionBarActivity {
             mainContentStr[i] = mainContent.get(i).toString(user.backendId);
             Log.d(null, mainContent.toString());
         }
-//        mainContentStr[0] = bill.toString();
-//        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
+
         Log.d("********", mainContentString.toString());
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this,
                 android.R.layout.simple_list_item_1,
                 mainContentString);
+
 
         listViewBills.setAdapter(arrayAdapter);
 

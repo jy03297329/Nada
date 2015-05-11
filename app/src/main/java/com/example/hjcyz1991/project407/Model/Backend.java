@@ -222,8 +222,6 @@ public class Backend {
     }
 
 
-
-
     public static void register(String name, String email, String password, String conPassword,
                                 final BackendCallback callback) {
         AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
@@ -381,6 +379,46 @@ public class Backend {
         });
     }
 
+    public static void getBillEvent(String userId, String pwd, final BackendCallback callback){
+        AsyncHttpClient client = new AsyncHttpClient(SERVER_URL);
+        StringEntity jsonParams = null;
+        try {
+            JSONObject json = new JSONObject();
+            json.put("cur_user_id", userId);
+            json.put("password", pwd);
+            //Log.d("LOAD_USER_BILL", json.toString());
+            jsonParams = new StringEntity(json.toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<Header> headers = new ArrayList<Header>();
+        headers.add(new BasicHeader("Accept", "application/json"));
+        headers.add(new BasicHeader("Content-Type", "application/json"));
+        client.post("events/event_list", jsonParams, headers, new JsonResponseHandler() {
+            @Override
+            public void onSuccess() {
+                //JsonObject result = getContent().getAsJsonObject();
+                JsonArray eventList = (JsonArray) getContent().getAsJsonObject().get("events");
+                List<BillEvent> newEvents = new ArrayList<BillEvent>();
+                for (JsonElement element : eventList) {
+                    JsonObject event = element.getAsJsonObject();
+                    event.addProperty("backendId", event.get("id").toString());
+                    event.remove("id");
+                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create();
+                    newEvents.add(gson.fromJson(event, BillEvent.class));
+                    //Log.d(null, newBill.toString());
+                }
+                callback.onRequestCompleted(newEvents);
+            }
+
+            @Override
+            public void onFailure() {
+                Log.d(null, "trying to get rec_bill list");
+                Log.d(null, "failed");
+                callback.onRequestFailed(handleFailure(getContent()));
+            }
+        });
+    }
     //actually add event
     public static void addBillEvent(User user, String totalAmt, String billName, String note,
                                int creditor_id, List<Bill> bills, final BackendCallback callback) {
