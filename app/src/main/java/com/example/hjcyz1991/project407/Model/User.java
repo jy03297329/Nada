@@ -60,16 +60,6 @@ public class User extends SugarRecord<User>{
 
     public List<User> getFriends(){
         Log.d("GETTING FRIEND: ", "getting friends");
-        /*String query = new StringBuilder()
-                .append("Select ")
-                .append(StringUtil.toSQLName("friend"))
-                .append(" from ").append(StringUtil.toSQLName("Friendship"))
-                .append(" where ").append(StringUtil.toSQLName("userId"))
-                .append(" = ?").toString();
-        Log.d("GETTING FRIEND: ", query);
-        return Friendship.findWithQuery(User.class, query,
-                Integer.toString(this.backendId));*/
-        //result.addAll(friendship.find(User.class, "user2 = ?", this.getId().toString()));
         return Friendship.find(User.class, "backend_id", Integer.toString(this.backendId));
         //return result;
     }

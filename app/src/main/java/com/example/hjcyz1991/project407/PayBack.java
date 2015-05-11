@@ -29,6 +29,8 @@ import com.hannesdorfmann.swipeback.SwipeBack;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 
 
@@ -56,7 +58,19 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
 //        pay = (Button)findViewById(R.id.button_pay);
 //        infoView = (TextView)findViewById(R.id.pay_back_info);
         tableLayout = (TableLayout)findViewById(R.id.pay_back_row_container);
-        billList = user.getBillPay();
+
+        try{
+            //billList.clear();
+            billList = new ArrayList<Bill>(user.getBillPay());
+        }catch (ConcurrentModificationException a){
+            try {
+                Thread.sleep(3000);
+                billList = user.getBillPay();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Log.d(null, "bill size: " + billList.size());
 
         for(int i = 0; i < billList.size(); i ++){
             position = i;
@@ -146,7 +160,7 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
                     new Backend.BackendCallback() {
                         @Override
                         public void onRequestCompleted(Object result) {
-                            //Log.d(null, "5");
+                            Log.d(null, "5");
 
                             Bill setBill = (Bill)result;
                             int bId = setBill.backendId;
