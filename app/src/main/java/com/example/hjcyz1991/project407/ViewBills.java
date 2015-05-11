@@ -110,6 +110,7 @@ public class ViewBills extends ActionBarActivity {
                                 new SwipeDismissListViewTouchListener.DismissCallbacks() {
                                     @Override
                                     public boolean canDismiss(int position) {
+
                                         return true;
                                     }
 
