@@ -22,6 +22,8 @@ import android.widget.Toast;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
 
+import java.util.ArrayList;
+
 
 public class SetAmounts extends ActionBarActivity {
     private Bundle bdlFrAddBill;
@@ -43,7 +45,7 @@ public class SetAmounts extends ActionBarActivity {
         cancel = (Button)findViewById(R.id.button_cancel_set_amt);
         bdlFrAddBill = this.getIntent().getBundleExtra("contactsSelected");
         names = bdlFrAddBill.getStringArray("selectedItems");
-        int[] debtorIds = bdlFrAddBill.getIntArray("selectedItemsID");
+        ArrayList<Integer> debtorIds = bdlFrAddBill.getIntegerArrayList("selectedItemsID");
         for(int i = 0; i < names.length; i ++){
             TableRow rowView = new TableRow(this);
             rowView.setLayoutParams(new TableRow.LayoutParams((TableRow.LayoutParams.MATCH_PARENT), TableRow.LayoutParams.WRAP_CONTENT));

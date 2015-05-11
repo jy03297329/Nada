@@ -58,8 +58,12 @@ public class AddGroups extends ActionBarActivity{
         mGetFriendsTask = new GetFriendsTask();
         mGetFriendsTask.execute();
 
-        while(!canContinue.check()){};
-
+        //while(!canContinue.check()){};
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
         //for testing only with the temp items array

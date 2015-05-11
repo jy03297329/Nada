@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -51,11 +52,17 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     private final int CONTACTS_SELECTED = 1;
     private final int AMOUNT_SET = 3;
     private ArrayList<Integer> selectedItemsID;
+    private double[] amounts;
     private Button setAmounts;
     private boolean addedContact = false;
     private Bundle bundleFromAddGrp;
     private Bundle bundleFromSetAmt;
+    private createBillEventTask mCreate;
 
+    private Bolean canContinue;
+
+
+    //private class BackendBill
 
     // Can be NO_NETWORK for OFFLINE, SANDBOX for TESTING and LIVE for PRODUCTION
     private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
@@ -79,13 +86,11 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        canContinue = new Bolean();
         setContentView(R.layout.activity_add_new_bill);
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_add_new_bill)
                 .setSwipeBackView(R.layout.swipeback_default);
-//        Intent intent = new Intent(this, PayPalService.class);
-//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-//        startService(intent);
         String userBackendID = SaveSharedPreference.getUserName(getApplicationContext());
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
@@ -147,14 +152,36 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
                     peopleEdit.requestFocus();
                     return;
                 }
+
+                List<Bill> bills = new ArrayList<Bill>();
                 String totalAmtStr = totalAmtView.getText().toString();
+                double totalAmt = Double.parseDouble(totalAmtStr);
                 String notesStr = notes.getText().toString();
-                System.out.print(billNameStr +" " +totalAmtStr + " " + notesStr);
+
+                for(int i = 0; i < selectedItemsID.size(); i++) {
+                    Bill newBill = new Bill();
+                    //newBill.creditor_id = user.backendId;
+                    newBill.debtor_id = selectedItemsID.get(i);
+                    newBill.amount = amounts[i];
+                    bills.add(newBill);
+                }
+                mCreate = new createBillEventTask(user, billNameStr, Double.toString(totalAmt), notesStr,
+                        user.backendId, bills);
+                mCreate.execute();
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //while(!canContinue.check()){};
+
+                System.out.print(billNameStr + " " + totalAmtStr + " " + notesStr);
         }
         });
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (resultCode == CONTACTS_SELECTED && requestCode == REQUEST_ADD_GROUP) {
             if (data.hasExtra("contactsSelected")) {
                 bundleFromAddGrp = data.getExtras().getBundle("contactsSelected");
@@ -170,18 +197,23 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
             }
         }
 
+
         if (resultCode == AMOUNT_SET && requestCode == REQUEST_SET_AMOUNT) {
             if (data.hasExtra("amountSet")) {
                 bundleFromSetAmt = data.getExtras().getBundle("amountSet");
-                double[] amounts = bundleFromSetAmt.getDoubleArray("amounts");
+                amounts = bundleFromSetAmt.getDoubleArray("amounts");
                 double totalAmt = 0;
                 for(int i = 0; i < amounts.length; i ++){
+                    Bill newBill = new Bill();
+                    newBill.creditor_id = user.backendId;
+
                     totalAmt += amounts[i];
                 }
                 totalAmtView.setText(Double.toString(totalAmt));
             }
 
         }
+
     }
 
 
@@ -215,6 +247,7 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
 
         return super.onOptionsItemSelected(item);
     }
+    //I pay
     public void showDialog(View v){
         if(billName.getText().toString().trim().length() == 0){
             billName.setError("Bill Name Cannot Be Empty");
@@ -229,13 +262,39 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
             notes.requestFocus();
             return;
         }
-        String receiver = "XXX";
+        if(selectedItemsID.size() > 0) Log.d(null, "more than one creditor!");
+        int creditorId = selectedItemsID.get(0);
+        List<User> users = User.find(User.class, "backend_id = ?", Integer.toString(creditorId));
+        String receiver = users.get(0).name;
         FragmentManager fm = getFragmentManager();
         PaymentMethodDialog paymentDialog = new PaymentMethodDialog();
         paymentDialog.show(fm, "PaymentDialog");
         Bundle data = new Bundle();
         data.putString("receiver", receiver);
         paymentDialog.setArguments(data);
+
+        double totalAmt = 0;
+        List<Bill> bills = new ArrayList<Bill>();
+        for(int i = 0; i < selectedItemsID.size(); i++) {
+            Bill newBill = new Bill();
+            //newBill.creditor_id = user.backendId;
+            newBill.debtor_id = user.backendId;
+            newBill.amount = amounts[i];
+            totalAmt += amounts[i];
+            bills.add(newBill);
+        }
+        Log.d(null, bills.toString());
+        mCreate = new createBillEventTask(user, billName.getText().toString().trim(),
+                Double.toString(totalAmt), notes.getText().toString().trim(),
+                selectedItemsID.get(0), bills);
+        mCreate.execute();
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //while(!canContinue.check()){};
+
     }
 
     @Override
@@ -250,8 +309,10 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
         private String note;
         private int creditorId;
         private List<Bill> billList;
+        private Bolean flag;
 
         createBillEventTask(User u, String e, String t, String n, int c, List<Bill> b){
+            flag = new Bolean();
             curUser = u;
             eventName = e;
             total = t;
@@ -280,6 +341,8 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
                                     Toast.LENGTH_SHORT).show();
                         }
                     });
+                    flag.release();
+                    canContinue.release();
                 }
                 @Override
                 public void onRequestFailed(final String message){
@@ -289,9 +352,18 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
                             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
                         }
                     });
+                    flag.lock();
+                    canContinue.release();
                 }
             });
-            return null;
+            while(!canContinue.check()){};
+            return flag.check();
+        }
+        @Override
+        protected void onPostExecute(final Boolean success) {
+            if (success) {
+                AddNewBill.this.finish();
+            }
         }
 
     }

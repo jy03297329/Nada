@@ -31,6 +31,9 @@ import com.orm.StringUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class ViewBills extends ActionBarActivity {
@@ -50,6 +53,14 @@ public class ViewBills extends ActionBarActivity {
     private Bolean task1;
     private Bolean task2;
 
+    private final List<Bill> billPay = new ArrayList<Bill>();
+    private final List<Bill> billRec = new ArrayList<Bill>();
+
+    private Lock lol = new ReentrantLock();
+    private final Condition c1 = lol.newCondition();
+    private final Condition c2 = lol.newCondition();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,41 +72,62 @@ public class ViewBills extends ActionBarActivity {
 
         task1.lock();
         task2.lock();
+        //lol.lock();
+        /*try{
+            mLoadPayBill = new LoadUserPayBillTask();
+            mLoadRecBill = new LoadUserRecBillTask();
+            mLoadPayBill.execute();
+            mLoadRecBill.execute();
+            while(!task1.check())
+                c1.await();
+            while(!task2.check())
+                c2.await();
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }*/
+        //finally {
+        //lol.unlock();
+        //}
         mLoadPayBill = new LoadUserPayBillTask();
         mLoadRecBill = new LoadUserRecBillTask();
         mLoadPayBill.execute();
         mLoadRecBill.execute();
-        //while(!(task1.check() && task2.check())){};
+        //while(!(task2.check() && task1.check())) {};
+        //while(!(mLoadRecBill.canContinue.check() && mLoadPayBill.canContinue.check())){};
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        //List<User> users2 = User.find(User.class, "backend_id = ?", userBackendID);
+        //user = users.get(0);
         setContentView(R.layout.activity_view_bills);
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_view_bills)
                 .setSwipeBackView(R.layout.swipeback_default);
-        iOwe = (Button)findViewById(R.id.i_owe);
-        oweMe = (Button)findViewById(R.id.owe_me);
-        final List<Bill> billPay = MainActivity.user.getBillPay();
-        final List<Bill> billRec = MainActivity.user.getBillRec();
+        iOwe = (Button) findViewById(R.id.i_owe);
+        oweMe = (Button) findViewById(R.id.owe_me);
+        //final List<Bill> billPay = MainActivity.user.getBillPay();
+        Log.d(null, "get bill pay : " + billPay.size());
+        //final List<Bill> billRec = MainActivity.user.getBillRec();
+        Log.d(null, "get bill rec : " + billRec.size());
         billPayCtn = new String[billPay.size()];
 //        billPayCtn = new String[billPay.size()];
         billRecCtn = new String[billRec.size()];
 
-        for(int i = 0; i < billPay.size(); i++){
+        for (int i = 0; i < billPay.size(); i++) {
             billPayCtn[i] = billPay.get(i).toString(user.backendId);
         }
-        for(int i = 0; i < billRec.size(); i++){
+        for (int i = 0; i < billRec.size(); i++) {
             billRecCtn[i] = billRec.get(i).toString(user.backendId);
         }
         arrayAdapterBillPay = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(Arrays.asList(billPayCtn)));
         arrayAdapterBillRec = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, new ArrayList<String>(Arrays.asList(billRecCtn)));
 
 
-        billView = (ListView)findViewById(R.id.bill_list_view);
+        billView = (ListView) findViewById(R.id.bill_list_view);
 
         iOwe.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,7 +216,7 @@ public class ViewBills extends ActionBarActivity {
                 List<BillEvent> billEvents = BillEvent.find(BillEvent.class, "backend_id = ?",
                         Integer.toString(billPay.get(position).event_id));
                 billEvent = billEvents.get(0);
-                if(payClicked)
+                if (payClicked)
                     clkedBill = billPay.get(position);
                 else
                     clkedBill = billRec.get(position);
@@ -208,16 +240,16 @@ public class ViewBills extends ActionBarActivity {
         View actionbar = inflater.inflate(R.layout.actionbar, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
-                ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER );
-        TextView actionbarTitle = (TextView)actionbar.findViewById(R.id.actionbar_title);
+                ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+        TextView actionbarTitle = (TextView) actionbar.findViewById(R.id.actionbar_title);
         actionbarTitle.setText("View Bills");
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setCustomView(actionbar, params);
         return true;
     }
 
-    public class removeBillTask extends AsyncTask<Void, Void, Boolean>{
+    public class removeBillTask extends AsyncTask<Void, Void, Boolean> {
         private String billId;
         private String userId;
         private String password;
@@ -225,7 +257,7 @@ public class ViewBills extends ActionBarActivity {
         private Bolean f;
         private Bolean canContinue;
 
-        removeBillTask(String b, String u, String p, String e){
+        removeBillTask(String b, String u, String p, String e) {
             billId = b;
             userId = u;
             password = p;
@@ -268,9 +300,12 @@ public class ViewBills extends ActionBarActivity {
                     canContinue.release();
                 }
             });
-            while(canContinue.check()){};
+            while (canContinue.check()) {
+            }
+            ;
             return f.check();
         }
+
         @Override
         protected void onPostExecute(final Boolean success) {
 
@@ -280,10 +315,12 @@ public class ViewBills extends ActionBarActivity {
                 List<Bill> bills = Bill.find(Bill.class, "backend_id = ?", billId);
                 //events.get(0).totalAmount -= bills.get(0).amount;
 
-                for(Bill i : bills)
+                for (Bill i : bills)
                     i.delete();
 
-            }else{
+                finish();
+
+            } else {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -296,8 +333,8 @@ public class ViewBills extends ActionBarActivity {
 
     public class LoadUserPayBillTask extends AsyncTask<Void, Void, Boolean> {
 
-        private Bolean canContinue;
-        private Bolean flag;
+        private final Bolean canContinue;
+        private final Bolean flag;
 
         LoadUserPayBillTask() {
             Log.d(null, "created a new billTask");
@@ -320,18 +357,21 @@ public class ViewBills extends ActionBarActivity {
                             StringUtil.toSQLName("creditor_id") + " = ?",
                             Integer.toString(user.backendId));
                     Log.d(TAG, "BillList get success. User: " + user.toString());
-                    for(Bill i : allBills)
+                    for (Bill i : allBills)
                         i.delete();
                     for (Bill i : resultBills) {
                         //if (user.getAllBillId().contains(i.backendId)) {
-                            Bill newBill = new Bill();
-                            newBill.copy(i);
-                            newBill.save();
-                            Log.d(TAG, "new bill saved: " + newBill.toString());
+                        Bill newBill = new Bill();
+                        newBill.copy(i);
+                        newBill.save();
+                        billPay.add(newBill);
+                        Log.d(TAG, "new bill saved: " + newBill.toString());
                         //}
                     }
+
                     task1.release();
-                    canContinue.release();
+                    //c1.signal();
+                    //canContinue.release();
                     //Log.d(TAG, "move on to main");
                 }
 
@@ -346,29 +386,34 @@ public class ViewBills extends ActionBarActivity {
                         }
                     });
                     task1.release();
-                    canContinue.release();
-
+                    //canContinue.release();
+                    //c1.signal();
                 }
             });
-            while(canContinue.check()){};
-            return flag.check();
+
+            //while(canContinue.check()){Log.d(null, "looping");};
+            return true;
         }
 
-        @Override
+        /*@Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
-;
-                //finish();
+                Log.d(null, "post1 success");
+                c1.signal();
+                //task1.release();
+                finish();
             } else {
+                Log.d(null, "post1 failure");
                 //mPasswordView.setError(getString(R.string.error_incorrect_password));
                 //mPasswordView.requestFocus();
             }
-        }
+        }*/
     }
+
     public class LoadUserRecBillTask extends AsyncTask<Void, Void, Boolean> {
 
-        private Bolean canContinue;
-        private Bolean flag;
+        private final Bolean canContinue;
+        private final Bolean flag;
 
         LoadUserRecBillTask() {
             Log.d(null, "created a new billRecTask");
@@ -392,22 +437,23 @@ public class ViewBills extends ActionBarActivity {
                             Integer.toString(user.backendId));
                     Log.d(TAG, "*****" + allBills.toString());
                     //final List<Integer> allBillsId = new ArrayList<Integer>();
-                    for(Bill i : allBills) {
+                    for (Bill i : allBills) {
                         //allBillsId.add(i.backendId);
                         i.delete();
                     }
                     Log.d(TAG, "BillList get success. User: " + user.toString());
                     for (Bill i : resultBills) {
-                        //if (!allBillsId.contains(i.backendId)) {
-                            Bill newBill = new Bill();
-                            newBill.copy(i);
-                            newBill.save();
-                            Log.d(TAG, "new bill saved: " + newBill.toString());
-                        //}
+                        Bill newBill = new Bill();
+                        newBill.copy(i);
+                        newBill.save();
+                        billRec.add(newBill);
+                        Log.d(TAG, "new bill saved: " + newBill.toString());
                     }
                     task2.release();
-                    canContinue.release();
-                    Log.d(TAG, "move on to main");
+                    Log.d(TAG, "LB_@@@@@@");
+                    //c2.signal();
+                    //canContinue.release();
+                    //Log.d(TAG, "move on to main");
                 }
 
                 @Override
@@ -421,19 +467,26 @@ public class ViewBills extends ActionBarActivity {
                         }
                     });
                     task2.release();
-                    canContinue.release();
+                    //canContinue.release();
+                    //c2.signal();
                 }
+
             });
-            while(canContinue.check()){};
-            return flag.check();
+            //while(canContinue.check()){Log.d(null, "looping");};
+
+            return true;
         }
 
-        @Override
+        /*@Override
         protected void onPostExecute(final Boolean success) {
             if (success) {
+                Log.d(null, "post2 success");
+                c2.signal();
+                finish();
             } else {
+                Log.d(null, "post2 failure");
             }
-        }
+        }*/
     }
 
 //
