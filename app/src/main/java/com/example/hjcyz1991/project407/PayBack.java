@@ -26,6 +26,7 @@ import com.example.hjcyz1991.project407.Model.BillEvent;
 import com.example.hjcyz1991.project407.Model.User;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
+import com.orm.StringUtil;
 
 import org.w3c.dom.Text;
 
@@ -55,22 +56,28 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
         //Log.d("MAIN_ACTIVITY", "getting user ID from login activity: " + userBackendID);
         List<User> users = User.find(User.class, "backend_id = ?", userBackendID);
         user = users.get(0);
+
 //        payback_search = (EditText)findViewById(R.id.pay_back_search);
 //        pay = (Button)findViewById(R.id.button_pay);
 //        infoView = (TextView)findViewById(R.id.pay_back_info);
         tableLayout = (TableLayout)findViewById(R.id.pay_back_row_container);
 
-        try{
+        //try{
             //billList.clear();
-            billList = new ArrayList<Bill>(user.getBillPay());
-        }catch (ConcurrentModificationException a){
-            try {
-                Thread.sleep(3000);
-                billList = user.getBillPay();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            billList = Bill.find(Bill.class, StringUtil.toSQLName("debtor_id") + " = ?",
+                    Integer.toString(user.backendId));
+        for(int i = billList.size() - 1; i > -1; i--){
+            if(billList.get(i).settled)
+                billList.remove(i);
         }
+        //}catch (ConcurrentModificationException a){
+           // try {
+                //Thread.sleep(3000);
+                //billList = user.getBillPay();
+            //} catch (InterruptedException e) {
+            //    e.printStackTrace();
+            //}
+        //}
         Log.d(null, "bill size: " + billList.size());
 
         for(int i = 0; i < billList.size(); i ++){

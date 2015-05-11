@@ -110,6 +110,14 @@ public class ViewBills extends ActionBarActivity {
         iOwe = (Button) findViewById(R.id.i_owe);
         oweMe = (Button) findViewById(R.id.owe_me);
         //final List<Bill> billPay = MainActivity.user.getBillPay();
+        for(int i = billPay.size()-1; i > -1; i--){
+            if(billPay.get(i).settled)
+                billPay.remove(i);
+        }
+        for(int i = billRec.size()-1; i > -1; i--){
+            if(billRec.get(i).settled)
+                billRec.remove(i);
+        }
         Log.d(null, "get bill pay : " + billPay.size());
         //final List<Bill> billRec = MainActivity.user.getBillRec();
         Log.d(null, "get bill rec : " + billRec.size());
@@ -118,6 +126,7 @@ public class ViewBills extends ActionBarActivity {
         billRecCtn = new String[billRec.size()];
 
         for (int i = 0; i < billPay.size(); i++) {
+
             billPayCtn[i] = billPay.get(i).toString(user.backendId);
         }
         for (int i = 0; i < billRec.size(); i++) {
