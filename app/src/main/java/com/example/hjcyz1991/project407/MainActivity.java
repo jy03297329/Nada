@@ -33,6 +33,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -52,18 +53,22 @@ public class MainActivity extends ActionBarActivity {
     private GCMClientManager pushClientManager;
     private final Bolean canContinue = new Bolean();
 
+    //private boolean stillAtMain = true;
+
     public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     private final List<Bill> mainContent = new ArrayList<Bill>();
+    private final List<String> mainContentString = new ArrayList<String>();
 
     String PROJECT_NUMBER = "16617277799";
     String regId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        //stillAtMain = true;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -88,32 +93,12 @@ public class MainActivity extends ActionBarActivity {
                 // exponential back-off when retrying.
             }
         });
-
-                //Get user
-
         Log.d("MAIN_ACTIVITY", user.getAllBillId().toString());
-
-        listViewBills = (ListView) findViewById(R.id.list_view_bills);
-
-        IOwe = (TextView)findViewById(R.id.I_owe);
-        IOwe.setText("Payable: $" + Double.toString(user.moneyPay));
-
-        owedMe = (TextView) findViewById(R.id.owed_me);
-        owedMe.setText("Receivable: $" + Double.toString(user.moneyRec));
-
-        balance = (TextView) findViewById(R.id.balance);
-        balance.setText("Balance: $" + Double.toString(0 - user.moneyPay));
-
-        /*Bill bill = new Bill();
-        bill.amount = 99.99;
-        bill.backendId = 123;
-        bill.creditor_id = 789;*/
-
-        ActivityTask mActivityTask = new ActivityTask();
-        Log.d(null, "new activityTask constructed");
+        //ActivityTask mActivityTask = new ActivityTask();
+        //Log.d(null, "new activityTask constructed");
 
 
-        Backend.getRecentActivities(user.authToken, Integer.toString(user.backendId),
+        /*Backend.getRecentActivities(user.authToken, Integer.toString(user.backendId),
                 new Backend.BackendCallback() {
                     @Override
                     public void onRequestCompleted(Object result) {
@@ -132,30 +117,54 @@ public class MainActivity extends ActionBarActivity {
                         });
                         canContinue.release();
                     }
-                });
+                });*/
 
 
         //mActivityTask.execute((Void) null);
         //mActivityTask.execute()
         //while(!canContinue.check()){}
-        try {
-            Thread.sleep(2000);
+        /*try {
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
+
+        /*for(Bill i : mainContent){
+            if(i.debtor_id == user.backendId){
+                user.moneyPay += i.amount;
+            }else{
+                user.moneyRec += i.amount;
+            }
+        }user.save();*/
+
+        listViewBills = (ListView) findViewById(R.id.list_view_bills);
+
+        IOwe = (TextView)findViewById(R.id.I_owe);
+        IOwe.setText("Payable: $" + Double.toString(user.moneyPay));
+
+        owedMe = (TextView) findViewById(R.id.owed_me);
+        owedMe.setText("Receivable: $" + Double.toString(user.moneyRec));
+
+        balance = (TextView) findViewById(R.id.balance);
+        balance.setText("Balance: $" + Double.toString(user.moneyRec - user.moneyPay));
 
         //Log.d(null, mainContent.toString());
+        //mainContentString.clear();
+        mainContentString.addAll(GcmIntentService.body);
         String[] mainContentStr = new String[mainContent.size()];
         for(int i = 0; i < mainContent.size(); i++){
             mainContentStr[i] = mainContent.get(i).toString(user.backendId);
             Log.d(null, mainContent.toString());
         }
-//        mainContentStr[0] = bill.toString();
-//        String[] items = new String[] { "Vegetables","Fruits","Flower Buds","Legumes","Bulbs","Tubers", "", "", "", "", "", "", "aaaaaaa","", "", "", "", "", "", "aaaaaaa" };
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                mainContentStr);
+
+        Log.d("********", mainContentString.toString());
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_list_item_1,
+                mainContentString);
+
 
         listViewBills.setAdapter(arrayAdapter);
+
 
 
     }
@@ -180,6 +189,7 @@ public class MainActivity extends ActionBarActivity {
         addNewBill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, AddNewBill.class);
                 startActivity(intent);
             }
@@ -189,6 +199,7 @@ public class MainActivity extends ActionBarActivity {
         payBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, PayBack.class);
                 startActivity(intent);
             }
@@ -198,6 +209,7 @@ public class MainActivity extends ActionBarActivity {
         sendReminder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, SendReminder.class);
                 startActivity(intent);
             }
@@ -207,6 +219,7 @@ public class MainActivity extends ActionBarActivity {
         viewBills.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, ViewBills.class);
                 startActivity(intent);
             }
@@ -216,6 +229,7 @@ public class MainActivity extends ActionBarActivity {
         profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, Profile.class);
                 startActivity(intent);
             }
@@ -225,6 +239,7 @@ public class MainActivity extends ActionBarActivity {
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //stillAtMain = false;
                 Intent intent = new Intent(MainActivity.this, Settings.class);
                 startActivityForResult(intent, LOGGED_OUT);
             }
@@ -242,6 +257,7 @@ public class MainActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.action_add_friends:
+                //stillAtMain = false;
                 Intent intentAddFriends = new Intent(MainActivity.this, AddFriends.class);
                 startActivity(intentAddFriends);
                 return true;
@@ -250,6 +266,7 @@ public class MainActivity extends ActionBarActivity {
 //                startActivity(intentAddGroups);
 //                return true;
             case R.id.action_scan_ur_code:
+                //stillAtMain = false;
                 Intent intentScanURCode = new Intent(this, ScanQRCode.class);
                 startActivity(intentScanURCode);
                 return true;

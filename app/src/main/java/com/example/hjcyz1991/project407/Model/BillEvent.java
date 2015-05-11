@@ -12,15 +12,11 @@ import java.util.List;
 public class BillEvent extends SugarRecord<BillEvent> {
 
     public int backendId;
-    //public int userId;
-    public String password;
-
     public int creditorId;
-
     public String name;
     public String note;
-    public int total;
-    public Date created_at;
+    public double total;
+    public String created_at;
 
     //public HashSet<Bill> bills; //debtor id, amount
 
@@ -28,8 +24,19 @@ public class BillEvent extends SugarRecord<BillEvent> {
 
     public BillEvent(){
         backendId = 0;
-        total = 0;
-        created_at = new Date();
+        total = 0.0;
+        creditorId = 0;
+        name = new String();
+        note = new String();
+        created_at = new String();
+    }
+
+    public void copy(BillEvent i){
+        backendId = i.backendId;
+        creditorId = i.creditorId;
+        name = new String(i.name);
+        note = new String(i.note);
+        created_at = new String(i.created_at);
     }
 
     public List<Bill> getBills(){
