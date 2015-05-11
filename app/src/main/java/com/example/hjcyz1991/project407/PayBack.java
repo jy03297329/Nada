@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -12,21 +13,29 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.hjcyz1991.project407.Model.Bill;
+import com.example.hjcyz1991.project407.Model.User;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
 
 import org.w3c.dom.Text;
 
+import java.util.List;
+
 
 public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Communicator{
-    private EditText payback_search;
-    private Button pay;
-    private TextView infoView;
-
-
+//    private EditText payback_search;
+//    private Button pay;
+//    private TextView infoView;
+    private TableLayout tableLayout;
+    private User user;
+    private List<Bill> billList;
+    private int position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +43,30 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_pay_back)
                 .setSwipeBackView(R.layout.swipeback_default);
-        payback_search = (EditText)findViewById(R.id.pay_back_search);
-        pay = (Button)findViewById(R.id.button_pay);
-        infoView = (TextView)findViewById(R.id.pay_back_info);
+//        payback_search = (EditText)findViewById(R.id.pay_back_search);
+//        pay = (Button)findViewById(R.id.button_pay);
+//        infoView = (TextView)findViewById(R.id.pay_back_info);
+        tableLayout = (TableLayout)findViewById(R.id.pay_back_row_container);
+        billList = user.getBillPay();
+        for(int i = 0; i < billList.size(); i ++){
+            position = i;
+            TableRow rowView = new TableRow(this);
+            rowView.setLayoutParams(new TableRow.LayoutParams((TableRow.LayoutParams.MATCH_PARENT), TableRow.LayoutParams.WRAP_CONTENT));
+            TextView textView = new TextView(this);
+            textView.setLayoutParams(new TableRow.LayoutParams((TableRow.LayoutParams.WRAP_CONTENT), TableRow.LayoutParams.WRAP_CONTENT, 2f));
+            textView.setText(billList.get(i).toString(user.backendId));
+            Button payButton = new Button(this);
+            payButton.setLayoutParams(new TableRow.LayoutParams((TableRow.LayoutParams.WRAP_CONTENT), TableRow.LayoutParams.WRAP_CONTENT, 1f));
+            payButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showDialog(v);
+                }
+            });
+            rowView.addView(textView,0);
+            rowView.addView(payButton,1);
+            tableLayout.addView(rowView, i);
+        }
     }
 
 
@@ -71,12 +101,12 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
         return super.onOptionsItemSelected(item);
     }
     public void showDialog(View v){
-        String receiver = "XXX";
+//        String receiver = billList.get(position).debtor_id;
         FragmentManager fm = getFragmentManager();
         PaymentMethodDialog paymentDialog = new PaymentMethodDialog();
         paymentDialog.show(fm, "PaymentDialog");
         Bundle data = new Bundle();
-        data.putString("receiver", receiver);
+//        data.putString("receiver", receiver);
         paymentDialog.setArguments(data);
         paymentDialog.setArguments(data);
     }
@@ -85,4 +115,6 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
     public void onDialogMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
+
+
 }

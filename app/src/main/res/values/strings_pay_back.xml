@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<string name="payback_search_hints">Search: user name, group</string>
+<string name="payback_search_hints">Search: user email </string>
 <string name="button_pay">Pay</string>
 
 

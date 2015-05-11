@@ -32,7 +32,7 @@ public class PaymentMethodDialog extends DialogFragment implements View.OnClickL
         settleByPaypal = (Button) view.findViewById(R.id.paypal_button);
         settleByCash.setOnClickListener(this);
         settleByPaypal.setOnClickListener(this);
-        setCancelable(false);
+//        setCancelable(false);
         return view;
     }
 
