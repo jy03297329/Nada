@@ -61,10 +61,10 @@ public class Bill extends SugarRecord<Bill> {
         creditor = users1.get(0).name;
         debtor = users2.get(0).name;
         if(userId == creditor_id){
-            sb.append(debtor).append(" owe you ")
+            sb.append(debtor).append(" owe you $")
                     .append(Double.toString(amount));
         }else{
-            sb.append("You owe ").append(creditor).append(" ")
+            sb.append("You owe ").append(creditor).append(" $")
                     .append(Double.toString(amount));
         }
         return sb.toString();
