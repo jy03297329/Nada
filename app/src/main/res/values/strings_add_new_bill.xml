@@ -7,4 +7,5 @@
     <string name="i_ask">I Ask</string>
     <string name="i_pay">I Pay</string>
     <string name="people_hint"> Please select only one user if you are paying</string>
+    <string name="set_amounts">Set Amounts</string>
 </resources>

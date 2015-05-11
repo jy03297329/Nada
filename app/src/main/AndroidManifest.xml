@@ -181,10 +181,18 @@
         <activity
             android:name=".EditBill"
             android:label="@string/title_activity_edit_bill"
-            android:parentActivityName=".ViewBills">
+            android:parentActivityName=".ViewBills" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.hjcyz1991.project407.ViewBills" />
+        </activity>
+        <activity
+            android:name=".SetAmounts"
+            android:label="@string/title_activity_set_amounts"
+            android:parentActivityName=".AddGroups">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.hjcyz1991.project407.AddGroups" />
         </activity>
         <activity android:name="com.paypal.android.sdk.payments.PayPalProfileSharingActivity" />
         <activity android:name="com.paypal.android.sdk.payments.ProfileSharingConsentActivity" />
@@ -208,6 +216,7 @@
         </receiver>
 
         <service android:name=".GcmIntentService" />
+
 
     </application>
 

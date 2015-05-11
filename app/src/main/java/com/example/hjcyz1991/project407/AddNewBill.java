@@ -37,16 +37,24 @@ import java.util.List;
 public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog.Communicator {
 
     private User user;
+    private String names;
+    String[] namesArr;
     private Button addContact;
     private Button iAsk;
     private Button iPay;
     private EditText billName;
-    private EditText totalAmt;
+    private TextView totalAmtView;
     private EditText notes;
     private TextView peopleEdit;
-    private final int REQUEST_CODE = 0;
+    private final int REQUEST_ADD_GROUP = 0;
+    private final int REQUEST_SET_AMOUNT = 2;
     private final int CONTACTS_SELECTED = 1;
+    private final int AMOUNT_SET = 3;
     private ArrayList<Integer> selectedItemsID;
+    private Button setAmounts;
+    private boolean addedContact = false;
+    private Bundle bundleFromAddGrp;
+    private Bundle bundleFromSetAmt;
 
 
     // Can be NO_NETWORK for OFFLINE, SANDBOX for TESTING and LIVE for PRODUCTION
@@ -84,15 +92,39 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
         peopleEdit = (TextView) findViewById(R.id.people_edit);
         addContact = (Button) findViewById(R.id.button_add_contact);
         billName = (EditText)findViewById(R.id.set_bill_name);
-        totalAmt = (EditText)findViewById(R.id.set_total_amount);
+        totalAmtView = (TextView)findViewById(R.id.set_total_amount);
+        setAmounts = (Button)findViewById(R.id.button_set_amounts);
         notes = (EditText)findViewById(R.id.set_notes);
         addContact.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AddNewBill.this, AddGroups.class);
-                startActivityForResult(intent, REQUEST_CODE);
+                if(addedContact){
+                    intent.putExtra("contactsSelected", bundleFromAddGrp);
+                    startActivityForResult(intent, REQUEST_ADD_GROUP);
+                }else{
+                    addedContact = true;
+                    startActivityForResult(intent, REQUEST_ADD_GROUP);
+                }
             }
         });
+
+        setAmounts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(selectedItemsID == null){
+                    Toast.makeText(AddNewBill.this, "Please select at least one friend",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Intent intent = new Intent(AddNewBill.this, SetAmounts.class);
+                intent.putExtra("contactsSelected", bundleFromAddGrp);
+                startActivityForResult(intent, REQUEST_SET_AMOUNT);
+            }
+        });
+
+
         iAsk = (Button)findViewById(R.id.i_ask);
         iPay = (Button)findViewById(R.id.i_pay);
 
@@ -100,29 +132,55 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
             @Override
             public void onClick(View v) {
                 //creat new bill
-                String billNameStr =  billName.getText().toString();
-                String totalAmtStr = totalAmt.getText().toString();
+                String billNameStr =  billName.getText().toString().trim();
+                if(billNameStr.length() == 0){
+                    billName.setError("Bill Name Cannot Be Empty");
+                    billName.requestFocus();
+                    return;
+                }
+                if(notes.getText().toString().trim().length() == 0){
+                    notes.setError("Notes cannot be empty");
+                    notes.requestFocus();
+                    return;
+                }
+                if(namesArr.length == 0 || namesArr == null){
+                    peopleEdit.requestFocus();
+                    return;
+                }
+                String totalAmtStr = totalAmtView.getText().toString();
                 String notesStr = notes.getText().toString();
                 System.out.print(billNameStr +" " +totalAmtStr + " " + notesStr);
         }
         });
-
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == CONTACTS_SELECTED && requestCode == REQUEST_CODE) {
+        if (resultCode == CONTACTS_SELECTED && requestCode == REQUEST_ADD_GROUP) {
             if (data.hasExtra("contactsSelected")) {
-                Bundle bundleNames = data.getExtras().getBundle("contactsSelected");
-                Bundle bundleID = data.getExtras().getBundle("contactsSelectedID");
-                String[] resultArr = bundleNames.getStringArray("selectedItems");
+                bundleFromAddGrp = data.getExtras().getBundle("contactsSelected");
+//                Bundle bundleID = data.getExtras().getBundle("contactsSelectedID");
+                namesArr = bundleFromAddGrp.getStringArray("selectedItems");
                 //Selected users' ids for backend communications
-                selectedItemsID = bundleID.getIntegerArrayList("selectedItemsID");
-                String names = resultArr[0];
-                for(int i = 1; i < resultArr.length; i++){
-                    names = names + ", " + resultArr[i];
+                selectedItemsID = bundleFromAddGrp.getIntegerArrayList("selectedItemsID");
+                names = namesArr[0];
+                for(int i = 1; i < namesArr.length; i++){
+                    names = names + ", " + namesArr[i];
                 }
                 peopleEdit.setText(names);
             }
+        }
+
+        if (resultCode == AMOUNT_SET && requestCode == REQUEST_SET_AMOUNT) {
+            if (data.hasExtra("amountSet")) {
+                bundleFromSetAmt = data.getExtras().getBundle("amountSet");
+                double[] amounts = bundleFromSetAmt.getDoubleArray("amounts");
+                double totalAmt = 0;
+                for(int i = 0; i < amounts.length; i ++){
+                    totalAmt += amounts[i];
+                }
+                totalAmtView.setText(Double.toString(totalAmt));
+            }
+
         }
     }
 
@@ -158,6 +216,19 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
         return super.onOptionsItemSelected(item);
     }
     public void showDialog(View v){
+        if(billName.getText().toString().trim().length() == 0){
+            billName.setError("Bill Name Cannot Be Empty");
+            billName.requestFocus();
+        }
+        if(namesArr == null || namesArr.length >1){
+            peopleEdit.requestFocus();
+            return;
+        }
+        if(notes.getText().toString().trim().length() == 0){
+            notes.setError("Notes cannot be empty");
+            notes.requestFocus();
+            return;
+        }
         String receiver = "XXX";
         FragmentManager fm = getFragmentManager();
         PaymentMethodDialog paymentDialog = new PaymentMethodDialog();

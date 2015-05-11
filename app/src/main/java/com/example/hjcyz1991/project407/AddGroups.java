@@ -83,6 +83,17 @@ public class AddGroups extends ActionBarActivity{
             }
         });
 
+        if(this.getIntent().hasExtra("contactsSelected")){
+            Bundle bundle =  this.getIntent().getExtras().getBundle("contactsSelected");
+            ArrayList<Integer> positionArr = bundle.getIntegerArrayList("selecteditemsPos");
+            for(int i = 0; i < positionArr.size(); i++){
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!" + positionArr.get(i));
+                contactsView.setItemChecked(positionArr.get(i), true);
+//                contactsView.getAdapter().getView(positionArr.get(i), null, null).performClick();
+//                contactsView.getAdapter().getView(positionArr.get(i), null, null).setCheck(true);
+            }
+        }
+
         group = (Button) findViewById(R.id.button_group);
         group.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,6 +102,7 @@ public class AddGroups extends ActionBarActivity{
                 SparseBooleanArray checked = contactsView.getCheckedItemPositions();
                 ArrayList<String> selectedItems = new ArrayList<String>();
                 ArrayList<Integer> selectedItemsID = new ArrayList<Integer>();
+                ArrayList<Integer> positionArr = new ArrayList<Integer>();
                 for (int i = 0; i < checked.size(); i++) {
                     // Item position in adapter
                     int position = checked.keyAt(i);
@@ -99,6 +111,7 @@ public class AddGroups extends ActionBarActivity{
                         added = true;
                         selectedItems.add(contactsAdapter.getItem(position));
                         selectedItemsID.add(contactsBackendID[position]);
+                        positionArr.add(0);
                     }
                 }
                 if(!added){
@@ -111,14 +124,15 @@ public class AddGroups extends ActionBarActivity{
                 for (int i = 0; i < selectedItems.size(); i++) {
                     outputStrArr[i] = selectedItems.get(i);
                 }
-                Bundle bundleNames = new Bundle();
-                bundleNames.putStringArray("selectedItems", outputStrArr);
-                Bundle bundleID = new Bundle();
-                bundleID.putIntegerArrayList("selectedItemsID", selectedItemsID);
-
+                Bundle bundle = new Bundle();
+                bundle.putStringArray("selectedItems", outputStrArr);
+//                Bundle bundleID = new Bundle();
+                bundle.putIntegerArrayList("selectedItemsID", selectedItemsID);
+                bundle.putIntegerArrayList("selecteditemsPos", positionArr);
                 Intent contactsSelected = new Intent();
-                contactsSelected.putExtra("contactsSelected", bundleNames);
-                contactsSelected.putExtra("contactsSelectedID", bundleID);
+                    contactsSelected.putExtra("contactsSelected",bundle);
+//                contactsSelected.putExtra("contactsSelected", bundleNames);
+//                contactsSelected.putExtra("contactsSelectedID", bundleID);
                 setResult(CONTACTS_SELECTED, contactsSelected);
                 finish();
             }

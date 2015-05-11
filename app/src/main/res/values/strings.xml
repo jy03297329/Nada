@@ -26,4 +26,5 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_edit_bill">EditBill</string>
+    <string name="title_activity_set_amounts">SetAmounts</string>
 </resources>
