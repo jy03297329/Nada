@@ -204,12 +204,12 @@ public class ViewBills extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_view_bills, menu);
+//        getMenuInflater().inflate(R.menu.menu_view_bills, menu);
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View actionbar = inflater.inflate(R.layout.actionbar, null);
+        View actionbar = inflater.inflate(R.layout.actionbar_no_menu, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
-                ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER );
+                ActionBar.LayoutParams.MATCH_PARENT, Gravity.CENTER );
         TextView actionbarTitle = (TextView)actionbar.findViewById(R.id.actionbar_title);
         actionbarTitle.setText("View Bills");
         getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM| ActionBar.DISPLAY_SHOW_HOME | ActionBar.DISPLAY_HOME_AS_UP);
@@ -437,7 +437,7 @@ public class ViewBills extends ActionBarActivity {
         }
     }
 
-//
+
 //    @Override
 //    public boolean onOptionsItemSelected(MenuItem item) {
 //        // Handle action bar item clicks here. The action bar will
@@ -446,7 +446,9 @@ public class ViewBills extends ActionBarActivity {
 //        int id = item.getItemId();
 //
 //        //noinspection SimplifiableIfStatement
-//        if (id == R.id.action_settings) {
+//        if (id == R.id.edit_bill) {
+//            Intent intent = new Intent(ViewBills.this, EditBill.class);
+//
 //            return true;
 //        }
 //

@@ -39,6 +39,7 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_pay_back);
         SwipeBack.attach(this, Position.LEFT)
                 .setContentView(R.layout.activity_pay_back)
@@ -55,6 +56,7 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
             TextView textView = new TextView(this);
             textView.setLayoutParams(new TableRow.LayoutParams((TableRow.LayoutParams.WRAP_CONTENT), TableRow.LayoutParams.WRAP_CONTENT, 2f));
             textView.setText(billList.get(i).toString(user.backendId));
+            textView.setTextAppearance(this, android.R.style.TextAppearance_Large);
             Button payButton = new Button(this);
             payButton.setLayoutParams(new TableRow.LayoutParams((TableRow.LayoutParams.WRAP_CONTENT), TableRow.LayoutParams.WRAP_CONTENT, 1f));
             payButton.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +65,7 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
                     showDialog(v);
                 }
             });
+            payButton.setText("Pay Back");
             rowView.addView(textView,0);
             rowView.addView(payButton,1);
             tableLayout.addView(rowView, i);
@@ -73,7 +76,7 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View actionbar = inflater.inflate(R.layout.actionbar, null);
+        View actionbar = inflater.inflate(R.layout.actionbar_no_menu, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER );
@@ -115,6 +118,11 @@ public class PayBack extends ActionBarActivity implements PaymentMethodDialog.Co
     public void onDialogMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
+    @Override
+    protected void onResume() {
 
+        super.onResume();
+        this.onCreate(null);
+    }
 
 }

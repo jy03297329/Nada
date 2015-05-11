@@ -31,22 +31,6 @@
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="18" />
 
-    <!-- hardware features -->
-    <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.camera.autofocus"
-        android:required="false" />
-
-    <!-- for card.io card scanning -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-
-    <!-- for most things, including card.io & paypal -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
     <application
         android:name="com.orm.SugarApp"
         android:allowBackup="true"
@@ -89,14 +73,6 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/title" >
-
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
         </activity>
         <activity
             android:name=".AddFriends"
@@ -194,17 +170,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.hjcyz1991.project407.AddGroups" />
         </activity>
-        <activity android:name="com.paypal.android.sdk.payments.PayPalProfileSharingActivity" />
-        <activity android:name="com.paypal.android.sdk.payments.ProfileSharingConsentActivity" />
-        <activity android:name="com.paypal.android.sdk.payments.FuturePaymentInfoActivity" />
-        <activity android:name="com.paypal.android.sdk.payments.LoginActivity" />
-        <!-- <activity android:name="com.paypal.android.sdk.payments.PayPalTouchActivity" -->
-        <!-- android:theme="@android:style/Theme.Translucent.NoTitleBar" /> -->
-
-        <service
-            android:name="com.paypal.android.sdk.payments.PayPalService"
-            android:exported="false" />
-
         <receiver
             android:name=".GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
@@ -216,8 +181,5 @@
         </receiver>
 
         <service android:name=".GcmIntentService" />
-
-
     </application>
-
 </manifest>

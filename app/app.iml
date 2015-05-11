@@ -92,8 +92,6 @@
     <orderEntry type="library" exported="" name="play-services-6.5.87" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
-    <orderEntry type="library" exported="" name="PayPalAndroidSDK-2.9.3" level="project" />
-    <orderEntry type="library" exported="" name="1_PayPalAndroidSDK-2.9.3" level="project" />
     <orderEntry type="library" exported="" name="httpcore-4.2.4" level="project" />
     <orderEntry type="library" exported="" name="httpmime-4.2.5" level="project" />
     <orderEntry type="library" exported="" name="swipeback-1.0.0" level="project" />

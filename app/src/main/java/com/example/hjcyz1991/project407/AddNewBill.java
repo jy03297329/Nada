@@ -26,9 +26,6 @@ import com.example.hjcyz1991.project407.Model.User;
 import com.google.gson.JsonObject;
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
-import com.paypal.android.sdk.payments.PayPalConfiguration;
-import com.paypal.android.sdk.payments.PayPalService;
-import com.paypal.android.sdk.payments.PaymentActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,26 +52,6 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     private boolean addedContact = false;
     private Bundle bundleFromAddGrp;
     private Bundle bundleFromSetAmt;
-
-
-    // Can be NO_NETWORK for OFFLINE, SANDBOX for TESTING and LIVE for PRODUCTION
-    private static final String CONFIG_ENVIRONMENT = PayPalConfiguration.ENVIRONMENT_NO_NETWORK;
-    // note that these credentials will differ between live & sandbox environments.
-    private static final String CONFIG_CLIENT_ID = "credential from developer.paypal.com";
-    // when testing in sandbox, this is likely the -facilitator email address.
-    private static final String CONFIG_RECEIVER_EMAIL = "your@email.com";
-
-    private static final int REQUEST_CODE_PAYMENT = 1;
-    private static final int REQUEST_CODE_FUTURE_PAYMENT = 2;
-    private static final int REQUEST_CODE_PROFILE_SHARING = 3;
-
-    private static PayPalConfiguration config = new PayPalConfiguration()
-            .environment(CONFIG_ENVIRONMENT)
-            .clientId(CONFIG_CLIENT_ID)
-            // The following are only used in PayPalFuturePaymentActivity.
-            .merchantName("Example Merchant")
-            .merchantPrivacyPolicyUri(Uri.parse("https://www.example.com/privacy"))
-            .merchantUserAgreementUri(Uri.parse("https://www.example.com/legal"));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,8 +120,19 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
                     notes.requestFocus();
                     return;
                 }
-                if(namesArr.length == 0 || namesArr == null){
+                if(namesArr == null){
+                    peopleEdit.setError("Please select at least one friend");
                     peopleEdit.requestFocus();
+                    return;
+                }
+                if(namesArr.length == 0){
+                    peopleEdit.setError("Please select at least one friend");
+                    peopleEdit.requestFocus();
+                    return;
+                }
+                if(totalAmtView.getText().toString().trim().length() == 0){
+                    totalAmtView.setError("Please input the amounts");
+                    totalAmtView.requestFocus();
                     return;
                 }
                 String totalAmtStr = totalAmtView.getText().toString();
@@ -188,7 +176,7 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View actionbar = inflater.inflate(R.layout.actionbar, null);
+        View actionbar = inflater.inflate(R.layout.actionbar_no_menu, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER );
@@ -220,13 +208,24 @@ public class AddNewBill extends ActionBarActivity implements PaymentMethodDialog
             billName.setError("Bill Name Cannot Be Empty");
             billName.requestFocus();
         }
-        if(namesArr == null || namesArr.length >1){
+        if(namesArr == null){
+            peopleEdit.setError("Please select one friend you'd like to pay");
+            peopleEdit.requestFocus();
+            return;
+        }
+        if(namesArr.length >1){
+            peopleEdit.setError("Please only select one friend");
             peopleEdit.requestFocus();
             return;
         }
         if(notes.getText().toString().trim().length() == 0){
             notes.setError("Notes cannot be empty");
             notes.requestFocus();
+            return;
+        }
+        if(totalAmtView.getText().toString().trim().length() == 0){
+            totalAmtView.setError("Please input the amount");
+            totalAmtView.requestFocus();
             return;
         }
         String receiver = "XXX";

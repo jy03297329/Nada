@@ -15,27 +15,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:id="@+id/amounts_table_container">
-        <!--<TableRow-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/row_container">-->
-        <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/amount_name_view"-->
-        <!--android:layout_column="1"-->
-        <!--android:layout_weight="2"-->
-        <!--/>-->
-        <!--<EditText-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/indi_amount_edit"-->
-        <!--android:layout_weight="1"-->
-        <!--android:inputType="numberDecimal"-->
-        <!--android:maxLines="1"-->
-        <!--android:singleLine="true"-->
-        <!--/>-->
-        <!--</TableRow>-->
     </TableLayout>
     <LinearLayout
         android:layout_width="match_parent"
