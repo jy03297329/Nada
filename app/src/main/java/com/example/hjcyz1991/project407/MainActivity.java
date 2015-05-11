@@ -80,8 +80,6 @@ public class MainActivity extends ActionBarActivity {
         pushClientManager.registerIfNeeded(new GCMClientManager.RegistrationCompletedHandler() {
             @Override
             public void onSuccess(String registrationId, boolean isNewRegistration) {
-                //Toast.makeText(MainActivity.this, registrationId,
-                        //Toast.LENGTH_SHORT).show();
                 regId = registrationId;
 
             }
@@ -94,48 +92,6 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         Log.d("MAIN_ACTIVITY", user.getAllBillId().toString());
-        //ActivityTask mActivityTask = new ActivityTask();
-        //Log.d(null, "new activityTask constructed");
-
-
-        /*Backend.getRecentActivities(user.authToken, Integer.toString(user.backendId),
-                new Backend.BackendCallback() {
-                    @Override
-                    public void onRequestCompleted(Object result) {
-                        mainContent.addAll((List<Bill>) result);
-                        canContinue.release();
-                    }
-
-                    @Override
-                    public void onRequestFailed(final String message) {
-                        Log.d(null, "Received error from Backend: " + message);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        canContinue.release();
-                    }
-                });*/
-
-
-        //mActivityTask.execute((Void) null);
-        //mActivityTask.execute()
-        //while(!canContinue.check()){}
-        /*try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-
-        /*for(Bill i : mainContent){
-            if(i.debtor_id == user.backendId){
-                user.moneyPay += i.amount;
-            }else{
-                user.moneyRec += i.amount;
-            }
-        }user.save();*/
 
         listViewBills = (ListView) findViewById(R.id.list_view_bills);
 

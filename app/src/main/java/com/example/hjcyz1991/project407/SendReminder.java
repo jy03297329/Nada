@@ -100,7 +100,7 @@ public class SendReminder extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View actionbar = inflater.inflate(R.layout.actionbar, null);
+        View actionbar = inflater.inflate(R.layout.actionbar_no_menu, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER );
@@ -126,5 +126,10 @@ public class SendReminder extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected  void onStop() {
+        super.onStop();
+        finish();
     }
 }

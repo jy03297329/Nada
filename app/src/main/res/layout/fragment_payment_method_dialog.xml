@@ -21,14 +21,5 @@
         android:id="@+id/cash_button"
         android:layout_weight="1"
         android:text="@string/cash_button_text"/>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/paypal_button"
-        android:layout_weight="1"
-        android:text="@string/paypal_button_text"/>
-
-
     </LinearLayout>
 </LinearLayout>

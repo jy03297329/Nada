@@ -29,9 +29,9 @@ public class PaymentMethodDialog extends DialogFragment implements View.OnClickL
         receiver = getArguments().getString("receiver");
         View view = inflater.inflate(R.layout.fragment_payment_method_dialog, null);
         settleByCash = (Button) view.findViewById(R.id.cash_button);
-        settleByPaypal = (Button) view.findViewById(R.id.paypal_button);
+//        settleByPaypal = (Button) view.findViewById(R.id.paypal_button);
         settleByCash.setOnClickListener(this);
-        settleByPaypal.setOnClickListener(this);
+//        settleByPaypal.setOnClickListener(this);
 //        setCancelable(false);
         return view;
     }

@@ -15,15 +15,11 @@ import android.widget.TextView;
 
 import com.hannesdorfmann.swipeback.Position;
 import com.hannesdorfmann.swipeback.SwipeBack;
-import com.paypal.android.sdk.payments.PayPalFuturePaymentActivity;
-import com.paypal.android.sdk.payments.PayPalService;
+
 
 
 public class Settings extends ActionBarActivity {
 
-    private static final int REQUEST_CODE_PAYMENT = 1;
-    private static final int REQUEST_CODE_FUTURE_PAYMENT = 2;
-    private static final int REQUEST_CODE_PROFILE_SHARING = 3;
     private final int LOGGED_OUT = 1;
 
     Button logout;
@@ -52,7 +48,7 @@ public class Settings extends ActionBarActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View actionbar = inflater.inflate(R.layout.actionbar, null);
+        View actionbar = inflater.inflate(R.layout.actionbar_no_menu, null);
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(
                 ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.WRAP_CONTENT, Gravity.CENTER );
@@ -77,14 +73,5 @@ public class Settings extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void onFuturePaymentPressed(View pressed) {
-        Intent intent = new Intent(this, PayPalFuturePaymentActivity.class);
-
-        // send the same configuration for restart resiliency
-//        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);
-
-        startActivityForResult(intent, REQUEST_CODE_FUTURE_PAYMENT);
     }
 }
